@@ -28,7 +28,7 @@ class Language:
     """The name of the language."""
     is_auto_generated: bool = False
     """Indicates if the transcript is auto-generated (ASR)."""
-    continuation_token: str = None
+    _continuation_token: str = None
     """Can be used to fetch the transcript in this language."""
 
     def __str__(self):
@@ -39,7 +39,7 @@ class Language:
             raise ValueError("Language code and display name cannot be empty.")
         if not isinstance(self.is_auto_generated, bool):
             raise ValueError("is_auto_generated must be a boolean value.")
-        if self.continuation_token is None:
+        if self._continuation_token is None:
             raise ValueError("continuation_token cannot be None.")
 
 
@@ -93,7 +93,7 @@ class LanguageList:
                                 code=language_code,
                                 display_name=name,
                                 is_auto_generated=is_auto_generated,
-                                continuation_token=continuation_token,
+                                _continuation_token=continuation_token,
                             )
                         )
         return cls(languages=languages)
@@ -278,7 +278,7 @@ class Transcript:
             )
             segments.append(segment)
         return cls(
-            video_id=get_video_id(lang.continuation_token),
+            video_id=get_video_id(language._continuation_token),
             language=lang,
             segments=segments,
         )

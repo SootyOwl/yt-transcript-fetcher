@@ -9,7 +9,7 @@ def sample_language(continuation_token):
     return Language(
         code="en",
         display_name="English",
-        continuation_token=continuation_token,
+        _continuation_token=continuation_token,
     )
 
 
@@ -136,7 +136,7 @@ def test_transcript_text():
     sample_language = Language(
         code="en",
         display_name="English",
-        continuation_token="sample_token",
+        _continuation_token="sample_token",
     )
     sample_segment1 = Segment(
         start_ms=0,
@@ -176,7 +176,7 @@ def test_transcript_invalid_creation():
     sample_language = Language(
         code="en",
         display_name="English",
-        continuation_token="sample_token",
+        _continuation_token="sample_token",
     )
 
     # Test with empty segments
@@ -203,7 +203,7 @@ def test_transcript_start_time():
     sample_language = Language(
         code="en",
         display_name="English",
-        continuation_token="sample_token",
+        _continuation_token="sample_token",
     )
     segment1 = Segment(
         start_ms=1000,
@@ -233,7 +233,7 @@ def test_transcript_end_time():
     sample_language = Language(
         code="en",
         display_name="English",
-        continuation_token="sample_token",
+        _continuation_token="sample_token",
     )
     segment1 = Segment(
         start_ms=1000,
@@ -263,7 +263,7 @@ def test_transcript_duration():
     sample_language = Language(
         code="en",
         display_name="English",
-        continuation_token="sample_token",
+        _continuation_token="sample_token",
     )
     segment1 = Segment(
         start_ms=1000,
@@ -293,7 +293,7 @@ def test_transcript_language_code():
     sample_language = Language(
         code="fr",
         display_name="French",
-        continuation_token="sample_token",
+        _continuation_token="sample_token",
     )
     segment = Segment(
         start_ms=1000,
@@ -316,7 +316,7 @@ def test_transcript_get_segment_by_time():
     sample_language = Language(
         code="en",
         display_name="English",
-        continuation_token="sample_token",
+        _continuation_token="sample_token",
     )
     segment1 = Segment(
         start_ms=1000,
@@ -356,7 +356,7 @@ def test_transcript_get_segments_by_text():
     sample_language = Language(
         code="en",
         display_name="English",
-        continuation_token="sample_token",
+        _continuation_token="sample_token",
     )
     segment1 = Segment(
         start_ms=1000,
@@ -407,7 +407,7 @@ def test_transcript_get_segments_by_time_range():
     sample_language = Language(
         code="en",
         display_name="English",
-        continuation_token="sample_token",
+        _continuation_token="sample_token",
     )
     segment1 = Segment(
         start_ms=1000,
@@ -461,7 +461,7 @@ def test_transcript_empty_segments_properties():
     sample_language = Language(
         code="en",
         display_name="English",
-        continuation_token="sample_token",
+        _continuation_token="sample_token",
     )
 
     # Create a transcript that would pass validation but test edge cases

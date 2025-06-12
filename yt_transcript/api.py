@@ -42,7 +42,7 @@ class YouTubeTranscriptFetcher:
         
         request_data = {
             "context": self._context,
-            "params": lang.continuation_token,
+            "params": lang._continuation_token,
         }
 
         response = self.session.post(self.URL, json=request_data, timeout=10)
