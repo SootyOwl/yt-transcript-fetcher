@@ -1,6 +1,7 @@
 import pytest
 
-from yt_transcript.models import Language, LanguageList, Segment, Transcript
+from yt_transcript.exceptions import NoSegmentsError
+from yt_transcript.models import Language, LanguageList, Segment, SegmentList, Transcript
 
 
 @pytest.fixture
@@ -45,7 +46,7 @@ def test_language_creation(sample_language, continuation_token):
     """Test creating a Language object."""
     assert sample_language.code == "en"
     assert sample_language.display_name == "English"
-    assert sample_language.continuation_token == continuation_token
+    assert sample_language._continuation_token == continuation_token
     assert not sample_language.is_auto_generated
 
 
@@ -181,7 +182,7 @@ def test_transcript_invalid_creation():
 
     # Test with empty segments
     with pytest.raises(
-        ValueError, match="Transcript must contain at least one segment"
+        NoSegmentsError, match="Transcript must contain at least one segment"
     ):
         Transcript(
             video_id="sample_video_id",
@@ -190,7 +191,7 @@ def test_transcript_invalid_creation():
         )
 
     # Test with invalid segment type
-    with pytest.raises(ValueError, match="Each segment must be a dictionary"):
+    with pytest.raises(ValueError, match="Each segment must be an instance of Segment"):
         Transcript(
             video_id="sample_video_id",
             language=sample_language,
@@ -335,7 +336,7 @@ def test_transcript_get_segment_by_time():
     transcript = Transcript(
         video_id="sample_video_id",
         language=sample_language,
-        segments=[segment1, segment2],
+        segments=SegmentList([segment1, segment2]),
     )
 
     # Test finding segment
@@ -382,7 +383,7 @@ def test_transcript_get_segments_by_text():
     transcript = Transcript(
         video_id="sample_video_id",
         language=sample_language,
-        segments=[segment1, segment2, segment3],
+        segments=SegmentList([segment1, segment2, segment3]),
     )
 
     # Test finding segments with "world"
@@ -433,7 +434,7 @@ def test_transcript_get_segments_by_time_range():
     transcript = Transcript(
         video_id="sample_video_id",
         language=sample_language,
-        segments=[segment1, segment2, segment3],
+        segments=SegmentList([segment1, segment2, segment3]),
     )
 
     # Test overlapping range

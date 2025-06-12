@@ -1,8 +1,9 @@
 """This module defines the data models for YouTube transcript processing."""
 
 from dataclasses import dataclass
+
 from yt_transcript.exceptions import NoLanguageError, NoSegmentsError
-from yt_transcript.protobuf import get_video_id, retrieve_language_code, is_asr_captions
+from yt_transcript.protobuf import get_video_id, is_asr_captions, retrieve_language_code
 
 
 def safe_get(data, path, default=None):
@@ -55,6 +56,30 @@ class LanguageList:
 
     def __str__(self):
         return ", ".join(str(lang) for lang in self.languages)
+
+    def __iter__(self):
+        """Iterate over the languages in the list."""
+        return iter(self.languages)
+
+    def __len__(self):
+        """Get the number of languages in the list."""
+        return len(self.languages)
+
+    def __getitem__(self, index):
+        """Get a language by index."""
+        return self.languages[index]
+
+    def __contains__(self, lang: Language):
+        """Check if a language is in the list."""
+        return lang in self.languages
+
+    def __eq__(self, other):
+        """Check if two LanguageList objects are equal."""
+        if not isinstance(other, LanguageList):
+            return False
+        return sorted(self.languages, key=lambda x: x.code) == sorted(
+            other.languages, key=lambda x: x.code
+        )
 
     def get_language_by_code(self, code: str) -> Language:
         """Retrieve a language by its code."""
@@ -147,6 +172,16 @@ class Segment:
 
     def __str__(self):
         return f"[{self.start_time_text}] {self.text}"
+    
+    @property
+    def start(self):
+        """The start time of the segment in seconds."""
+        return self.start_ms / 1000.0
+    
+    @property
+    def end(self):
+        """The end time of the segment in seconds."""
+        return self.end_ms / 1000.0
 
     @classmethod
     def from_dict(cls, segment_dict):
@@ -176,6 +211,132 @@ class Segment:
 
 
 @dataclass
+class SegmentList:
+    """Represents a list of segments in a YouTube video transcript."""
+
+    segments: list[Segment]
+
+    def __post_init__(self):
+        for segment in self.segments:
+            if not isinstance(segment, Segment):
+                raise ValueError("Each segment must be an instance of Segment.")
+
+    def __str__(self):
+        return f"SegmentList with {len(self.segments)} segments."
+
+    def __iter__(self):
+        """Iterate over the segments in the list."""
+        return iter(self.segments)
+
+    def __len__(self):
+        """Get the number of segments in the list."""
+        return len(self.segments)
+
+    def __getitem__(self, index):
+        """Get a segment by index."""
+        return self.segments[index]
+
+    def __contains__(self, segment: Segment):
+        """Check if a segment is in the list."""
+        return segment in self.segments
+
+    def __eq__(self, other):
+        """Check if two SegmentList objects are equal."""
+        if not isinstance(other, SegmentList):
+            return False
+        return sorted(self.segments, key=lambda x: x.start_ms) == sorted(
+            other.segments, key=lambda x: x.start_ms
+        )
+
+    def __bool__(self):
+        """Check if the SegmentList is not empty."""
+        return bool(self.segments)
+
+    @property
+    def start_time(self):
+        """Get the start time of the transcript in milliseconds."""
+        return self.segments[0].start_ms if self.segments else 0
+
+    @property
+    def end_time(self):
+        """Get the end time of the transcript in milliseconds."""
+        return self.segments[-1].end_ms if self.segments else 0
+
+    @classmethod
+    def from_response(cls, response_data):
+        initial_transcript_parts = safe_get(
+            response_data,
+            "actions.0.updateEngagementPanelAction.content.transcriptRenderer.content.transcriptSearchPanelRenderer.body.transcriptSegmentListRenderer.initialSegments",
+            [],
+        )
+        if not initial_transcript_parts:
+            raise NoSegmentsError("No transcript segments found in the response data.")
+        segments = []
+        for segment_dict in initial_transcript_parts:
+            segment = Segment.from_dict(
+                segment_dict.get("transcriptSegmentRenderer", {})
+            )
+            segments.append(segment)
+        return cls(segments=segments)
+
+    def get_segment_by_time(self, time_ms):
+        """Get the segment that contains the specified time in milliseconds."""
+        return next(
+            (
+                segment
+                for segment in self.segments
+                if segment.start_ms <= time_ms < segment.end_ms
+            ),
+            None,
+        )
+
+    def get_segments_by_text(self, text) -> "SegmentList":
+        """Get all segments that contain the specified text.
+
+        Args:
+            text (str): The text to search for in the segments.
+        Returns:
+            SegmentList: A list of segments that contain the specified text.
+        """
+        return SegmentList(
+            [
+                segment
+                for segment in self.segments
+                if text.lower() in segment.text.lower()
+            ]
+        )
+
+    def get_segments_by_time_range(self, start_ms: int, end_ms: int) -> "SegmentList":
+        """Get all segments that overlap with the specified time range.
+
+        Inclusive of start_ms and exclusive of end_ms.
+        Args:
+            start_ms (int): Start time in milliseconds.
+            end_ms (int): End time in milliseconds.
+        Returns:
+            SegmentList: A list of segments that overlap with the specified time range.
+        Raises:
+            ValueError: If start_ms is not less than end_ms, or if times are negative.
+        """
+        if start_ms >= end_ms:
+            raise ValueError("Start time must be less than end time.")
+        if not self.segments:
+            return []
+        if start_ms < 0 or end_ms < 0:
+            raise ValueError("Start and end times must be non-negative.")
+        if start_ms >= self.end_time or end_ms <= self.start_time:
+            return []
+
+        return SegmentList(
+            segments=[
+                segment
+                for segment in self.segments
+                if not (segment.end_ms <= start_ms or segment.start_ms >= end_ms)
+            ]
+        )
+
+
+@dataclass
 class Transcript:
     """Represents a YouTube video transcript."""
 
@@ -183,15 +344,15 @@ class Transcript:
     """The ID of the YouTube video."""
     language: Language
     """The language of the transcript, represented by a Language object."""
-    segments: list[Segment]
+    segments: SegmentList
     """A list of timed entries in the transcript."""
 
     def __post_init__(self):
         if not self.segments:
-            raise ValueError("Transcript must contain at least one segment.")
+            raise NoSegmentsError("Transcript must contain at least one segment.")
         for segment in self.segments:
             if not isinstance(segment, Segment):
-                raise ValueError("Each segment must be a dictionary.")
+                raise ValueError("Each segment must be an instance of Segment.")
 
     def __str__(self):
         return (
@@ -225,16 +386,11 @@ class Transcript:
 
     def get_segment_by_time(self, time_ms):
         """Get the segment that contains the specified time in milliseconds."""
-        for segment in self.segments:
-            if segment.start_ms <= time_ms < segment.end_ms:
-                return segment
-        return None
+        return self.segments.get_segment_by_time(time_ms)
 
     def get_segments_by_text(self, text):
         """Get all segments that contain the specified text."""
-        return [
-            segment for segment in self.segments if text.lower() in segment.text.lower()
-        ]
+        return self.segments.get_segments_by_text(text)
 
     def get_segments_by_time_range(self, start_ms, end_ms):
         """Get all segments that overlap with the specified time range.
@@ -243,42 +399,13 @@ class Transcript:
         Raises:
             ValueError: If start_ms is not less than end_ms, or if times are negative.
         """
-        if start_ms >= end_ms:
-            raise ValueError("Start time must be less than end time.")
-        if not self.segments:
-            return []
-        if start_ms < 0 or end_ms < 0:
-            raise ValueError("Start and end times must be non-negative.")
-        if start_ms >= self.end_time or end_ms <= self.start_time:
-            return []
-
-        return [
-            segment
-            for segment in self.segments
-            if not (segment.end_ms <= start_ms or segment.start_ms >= end_ms)
-        ]
+        return self.segments.get_segments_by_time_range(start_ms, end_ms)
 
     @classmethod
-    def from_response(cls, lang, response_data):
+    def from_response(cls, language: Language, response_data: dict):
         """Create a Transcript from a response dictionary."""
-        # response_data['actions'][0]['updateEngagementPanelAction']['content']['transcriptRenderer']['content']['transcriptSearchPanelRenderer']['body']['transcriptSegmentListRenderer']['initialSegments']
-        initial_transcript_parts = safe_get(
-            response_data,
-            "actions.0.updateEngagementPanelAction.content.transcriptRenderer.content.transcriptSearchPanelRenderer.body.transcriptSegmentListRenderer.initialSegments",
-            [],
-        )
-        if not initial_transcript_parts:
-            raise NoSegmentsError(
-                "No transcript segments found in the response data."
-            )
-        segments = []
-        for segment_dict in initial_transcript_parts:
-            segment = Segment.from_dict(
-                segment_dict.get("transcriptSegmentRenderer", {})
-            )
-            segments.append(segment)
         return cls(
             video_id=get_video_id(language._continuation_token),
-            language=lang,
-            segments=segments,
+            language=language,
+            segments=SegmentList.from_response(response_data),
         )

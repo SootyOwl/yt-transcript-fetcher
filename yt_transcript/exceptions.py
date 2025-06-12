@@ -27,3 +27,10 @@ class VideoNotFoundError(Exception):
     def __init__(self, message="The requested YouTube video was not found."):
         self.message = message
         super().__init__(self.message)
+
+class InvalidLanguageCodeError(Exception):
+    """Exception raised when an invalid language code is provided."""
+
+    def __init__(self, message="Invalid language code provided."):
+        self.message = message
+        super().__init__(self.message)
