@@ -1,7 +1,7 @@
 """This module defines the data models for YouTube transcript processing."""
 
 from dataclasses import dataclass
-from yt_transcript.exceptions import NoLanguageError
+from yt_transcript.exceptions import NoLanguageError, NoSegmentsError
 from yt_transcript.protobuf import get_video_id, retrieve_language_code, is_asr_captions
 
 
