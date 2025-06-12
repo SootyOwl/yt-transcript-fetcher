@@ -69,9 +69,12 @@ class LanguageList:
         """Get a language by index."""
         return self.languages[index]
 
-    def __contains__(self, lang: Language):
+    def __contains__(self, lang: Language | str):
         """Check if a language is in the list."""
-        return lang in self.languages
+        if isinstance(lang, str):
+            return any(language.code == lang for language in self.languages)
+        if isinstance(lang, Language):
+            return lang in self.languages
 
     def __eq__(self, other):
         """Check if two LanguageList objects are equal."""
