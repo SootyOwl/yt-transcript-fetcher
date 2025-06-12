@@ -17,13 +17,3 @@ All notable changes to this project will be documented in this file. See
 ### Bug Fixes
 
 * Add NoSegmentsError exception import to models.py ([3ebee4a](https://github.com/SootyOwl/yt-transcript-fetcher/commit/3ebee4a59dc8fdb0d6b36b89e6ff5b20324bce10))
-
-# Changelog
-
-## [Unreleased]
-
-## [0.1.1] - 2025-06-12
-
-### Added
-- Initial release of the project.
-- Ability to list available transcripts and retreive specific transcripts by language code.
