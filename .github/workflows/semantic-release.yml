@@ -29,7 +29,7 @@ jobs:
         with:
           python-version: "3.10"
       - name: Install poetry
-        run: pip install poetry==1.2.1
+        run: pip install poetry==2.1.1
       - uses: bjoluc/semantic-release-config-poetry@v2
         with:
           pypi_token: ${{ secrets.PYPI_TOKEN }}
