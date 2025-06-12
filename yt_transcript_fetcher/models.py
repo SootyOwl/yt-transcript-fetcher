@@ -168,10 +168,8 @@ class Segment:
     """Accessibility label for screen readers."""
 
     def __post_init__(self):
-        if self.start_ms < 0 or self.end_ms <= self.start_ms:
+        if self.start_ms < 0 or self.end_ms < 0:
             raise ValueError("Invalid segment time range.")
-        if not self.text:
-            raise ValueError("Segment text cannot be empty.")
 
     def __str__(self):
         return f"[{self.start_time_text}] {self.text}"
