@@ -1,6 +1,6 @@
 # Example usage of the yt_transcript package to fetch and display YouTube video transcripts.
 from re import search
-from yt_transcript import get_transcript, list_languages
+from yt_transcript_fetcher import get_transcript, list_languages
 
 
 def main():

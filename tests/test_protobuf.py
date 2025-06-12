@@ -1,5 +1,5 @@
 import pytest
-from yt_transcript.protobuf import (
+from yt_transcript_fetcher.protobuf import (
     _encode_protobuf_field,
     _create_nested_protobuf,
     _create_main_protobuf,

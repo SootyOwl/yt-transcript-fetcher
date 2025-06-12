@@ -1,7 +1,7 @@
 import pytest
 
-from yt_transcript.exceptions import NoSegmentsError
-from yt_transcript.models import Language, LanguageList, Segment, SegmentList, Transcript
+from yt_transcript_fetcher.exceptions import NoSegmentsError
+from yt_transcript_fetcher.models import Language, LanguageList, Segment, SegmentList, Transcript
 
 
 @pytest.fixture

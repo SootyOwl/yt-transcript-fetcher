@@ -1,7 +1,7 @@
 import pytest
-from yt_transcript.api import YouTubeTranscriptFetcher
-from yt_transcript.exceptions import NoTranscriptError, VideoNotFoundError
-from yt_transcript.models import Language
+from yt_transcript_fetcher.api import YouTubeTranscriptFetcher
+from yt_transcript_fetcher.exceptions import NoTranscriptError, VideoNotFoundError
+from yt_transcript_fetcher.models import Language
 
 
 @pytest.fixture

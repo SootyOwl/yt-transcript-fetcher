@@ -1,7 +1,7 @@
 # basic CLI for downloading YouTube transcripts
 import argparse
 
-from yt_transcript import get_transcript, list_languages
+from yt_transcript_fetcher import get_transcript, list_languages
 
 def main():
     parser = argparse.ArgumentParser(description="Download YouTube video transcripts.")

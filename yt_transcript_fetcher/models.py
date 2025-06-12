@@ -2,8 +2,8 @@
 
 from dataclasses import dataclass
 
-from yt_transcript.exceptions import NoLanguageError, NoSegmentsError
-from yt_transcript.protobuf import get_video_id, is_asr_captions, retrieve_language_code
+from yt_transcript_fetcher.exceptions import NoLanguageError, NoSegmentsError
+from yt_transcript_fetcher.protobuf import get_video_id, is_asr_captions, retrieve_language_code
 
 
 def safe_get(data, path, default=None):

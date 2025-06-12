@@ -1,9 +1,9 @@
 from encodings.punycode import T
 from typing import Optional
 import requests
-from yt_transcript.exceptions import NoTranscriptError, VideoNotFoundError
-from yt_transcript.protobuf import generate_params
-from yt_transcript.models import LanguageList, Transcript
+from yt_transcript_fetcher.exceptions import NoTranscriptError, VideoNotFoundError
+from yt_transcript_fetcher.protobuf import generate_params
+from yt_transcript_fetcher.models import LanguageList, Transcript
 
 
 YouTubeVideoID = str

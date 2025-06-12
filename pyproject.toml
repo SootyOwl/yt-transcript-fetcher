@@ -1,5 +1,5 @@
 [project]
-name = "yt-transcript"
+name = "yt-transcript-fetcher"
 version = "0.1.0"
 description = "This library can be used to fetch transcripts for YouTube videos"
 authors = [
@@ -7,7 +7,7 @@ authors = [
 ]
 license = {text = "MIT"}
 readme = "README.md"
-requires-python = "^3.9"
+requires-python = ">=3.9,<4.0"
 dependencies = [
     "requests (>=2.32.4,<3.0.0)"
 ]
