@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.0](https://github.com/SootyOwl/yt-transcript-fetcher/compare/v1.0.0...v1.1.0) (2025-06-12)
+
+
+### Features
+
+* :children_crossing: enhance language containment check in LanguageList to allow checking by language code string ([c0e76a6](https://github.com/SootyOwl/yt-transcript-fetcher/commit/c0e76a6309b6060940f1198e6a33bf21ce607bdf))
+
 ## 1.0.0 (2025-06-12)
 
 
