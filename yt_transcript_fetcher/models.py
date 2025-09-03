@@ -1,6 +1,7 @@
 """This module defines the data models for YouTube transcript processing."""
 
 from dataclasses import dataclass
+from typing import Union
 
 from yt_transcript_fetcher.exceptions import NoLanguageError, NoSegmentsError
 from yt_transcript_fetcher.protobuf import get_video_id, is_asr_captions, retrieve_language_code
@@ -69,7 +70,7 @@ class LanguageList:
         """Get a language by index."""
         return self.languages[index]
 
-    def __contains__(self, lang: Language | str):
+    def __contains__(self, lang: Union[Language, str]):
         """Check if a language is in the list."""
         if isinstance(lang, str):
             return any(language.code == lang for language in self.languages)
