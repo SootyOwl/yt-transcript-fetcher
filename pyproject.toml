@@ -32,7 +32,11 @@ build-backend = "hatchling.build"
 
 [tool.semantic_release]
 version_toml = ["pyproject.toml:project.version"]
-build_command = "uv build"
+build_command = """
+    uv lock --upgrade-package yt-transcript-fetcher
+    git add uv.lock
+    uv build
+"""
 commit_parser = "conventional"
 
 [tool.semantic_release.commit_parser_options]
