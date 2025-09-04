@@ -23,7 +23,11 @@ dependencies = ["requests (>=2.32.4,<3.0.0)"]
 yt-transcript = "yt_transcript.cli:main"
 
 [dependency-groups]
-dev = ["pytest>=8.4.0,<9"]
+dev = [
+    "pytest>=8.4.0,<9",
+    "pytest-repeat>=0.9.4",
+    "pytest-xdist>=3.8.0",
+]
 
 [project.optional-dependencies]
 build = ["uv ~= 0.8.14"]
@@ -58,3 +62,7 @@ prerelease = false
 match = "^(feat|fix|perf)/.+"
 prerelease = true
 prerelease_token = "alpha"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-n auto"
