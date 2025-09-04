@@ -4,18 +4,24 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
+        type: choice
         description: 'Dry run (no tag / no publish)'
         required: false
+        options:
+          - 'true'
+          - 'false'
         default: 'false'
       force:
         type: choice
         description: 'Force release even if no relevant changes'
         required: false
         options:
+          - 'false'
           - 'prerelease'
           - 'patch'
           - 'minor'
           - 'major'
+        default: 'false'
   workflow_run:
     workflows: [Run Tests]
     types: [completed]
@@ -74,13 +80,20 @@ jobs:
             echo "mode=LIVE" >> "$GITHUB_OUTPUT"
             echo "Running in LIVE mode."
           fi
+        
+      - name: Mode | Force release type
+        id: force
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.force != 'false'
+        run: |
+          echo "Forcing release type: ${{ github.event.inputs.force }}"
+          echo "force=${{ github.event.inputs.force }}" >> "$GITHUB_OUTPUT"
 
       - name: Action | Semantic Version Release (${{ steps.mode.outputs.mode }})
         id: release
         uses: python-semantic-release/python-semantic-release@v10.3.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          force: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.force || '' }}
+          force: ${{ steps.force.outputs.force }}
           changelog: true
           git_committer_name: github-actions
           git_committer_email: actions@users.noreply.github.com
