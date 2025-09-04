@@ -18,7 +18,7 @@ class YouTubeTranscriptFetcher:
         self.session = session or requests.Session()
         self.session.headers.update({"Content-Type": "application/json"})
         self._context = {
-            "client": {"clientName": "WEB", "clientVersion": "2.20250609.01.00"}
+            "client": {"clientName": "WEB", "clientVersion": "2.20250903.04.00"}
         }
         self.URL = (
             "https://www.youtube.com/youtubei/v1/get_transcript?prettyPrint=false"
