@@ -36,10 +36,13 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Multimedia :: Video",
 ]
-dependencies = ["requests (>=2.32.4,<3.0.0)"]
+dependencies = [
+    "argcomplete>=3.6.2",
+    "requests (>=2.32.4,<3.0.0)",
+]
 
 [project.scripts]
-yt-transcript = "yt_transcript.cli:main"
+yt-transcript-fetcher = "yt_transcript_fetcher.cli:main"
 
 [project.urls]
 "Home Page" = "https://github.com/SootyOwl/yt-transcript-fetcher"
