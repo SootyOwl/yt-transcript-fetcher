@@ -66,11 +66,6 @@ jobs:
             echo "Running in LIVE mode."
           fi
 
-      - name: Setup | Set up uv
-        uses: astral-sh/setup-uv@v6.5.0
-        with:
-          enable-cache: true
-
       - name: Action | Semantic Version Release (${{ steps.mode.outputs.mode }})
         id: release
         uses: python-semantic-release/python-semantic-release@v10.3.1

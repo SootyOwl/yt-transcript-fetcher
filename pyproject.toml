@@ -25,6 +25,9 @@ yt-transcript = "yt_transcript.cli:main"
 [dependency-groups]
 dev = ["pytest>=8.4.0,<9"]
 
+[project.optional-dependencies]
+build = ["uv ~= 0.8.14"]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
@@ -33,6 +36,7 @@ build-backend = "hatchling.build"
 [tool.semantic_release]
 version_toml = ["pyproject.toml:project.version"]
 build_command = """
+    python -m pip install -e '.[build]'
     uv lock --upgrade-package yt-transcript-fetcher
     git add uv.lock
     uv build
