@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.2.0 (2025-09-04)
+
+### Documentation
+
+- **CHANGELOG**: Clean up CHANGELOG by removing unreleased section
+  ([`2353618`](https://github.com/SootyOwl/yt-transcript-fetcher/commit/2353618617971f27524212cbdbcf59a068a4e8f0))
+
+### Features
+
+- **cli**: Enhance command-line interface for transcripts
+  ([`a67a8ad`](https://github.com/SootyOwl/yt-transcript-fetcher/commit/a67a8ad6ba715738f5e8a7892cd406f6fc12d9ba))
+
+
 ## v1.1.5 (2025-09-04)
 
 ### Documentation
