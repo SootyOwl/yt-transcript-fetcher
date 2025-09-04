@@ -42,10 +42,10 @@ dependencies = ["requests (>=2.32.4,<3.0.0)"]
 yt-transcript = "yt_transcript.cli:main"
 
 [project.urls]
-source = "https://github.com/SootyOwl/yt-transcript-fetcher"
-issues = "https://github.com/SootyOwl/yt-transcript-fetcher/issues"
-releasenotes = "https://github.com/SootyOwl/yt-transcript-fetcher/releases"
-changelog = "https://github.com/SootyOwl/yt-transcript-fetcher/blob/main/CHANGELOG.md"
+"Home Page" = "https://github.com/SootyOwl/yt-transcript-fetcher"
+"Issue Tracker" = "https://github.com/SootyOwl/yt-transcript-fetcher/issues"
+"Release Notes" = "https://github.com/SootyOwl/yt-transcript-fetcher/releases"
+CHANGELOG = "https://github.com/SootyOwl/yt-transcript-fetcher/blob/main/CHANGELOG.md"
 
 [dependency-groups]
 dev = [
