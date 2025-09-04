@@ -2,6 +2,20 @@
 
 <!-- version list -->
 
+## v1.1.5 (2025-09-04)
+
+### Documentation
+
+- **CHANGELOG**: Update CHANGELOG format and content
+  ([`d0890a4`](https://github.com/SootyOwl/yt-transcript-fetcher/commit/d0890a4969e6ec2744f9863695771c36e3fc7c2e))
+
+- **pyproject**: Update project URLs format
+  ([`69eb8d5`](https://github.com/SootyOwl/yt-transcript-fetcher/commit/69eb8d5e858c2828594df667d5f934684006eef1))
+
+- **README**: Reorder badges for better visibility
+  ([`07a3452`](https://github.com/SootyOwl/yt-transcript-fetcher/commit/07a34525ebf7b17998c972b33513af624342a023))
+
+
 ## Unreleased
 
 ### Documentation
