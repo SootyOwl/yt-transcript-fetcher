@@ -1,3 +1,6 @@
+[![Run Tests](https://github.com/SootyOwl/yt-transcript-fetcher/actions/workflows/run-tests.yml/badge.svg)](https://github.com/SootyOwl/yt-transcript-fetcher/actions/workflows/run-tests.yml)
+
+
 # yt-transcript-fetcher
 
 A python package to fetch YouTube video transcripts.
