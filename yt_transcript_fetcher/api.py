@@ -17,6 +17,17 @@ class YouTubeTranscriptFetcher:
         """Initialize the YouTubeTranscriptFetcher with an optional session."""
         self.session = session or requests.Session()
         # Set default headers to mimic a browser request
+        self.initialise_session()
+        self._context = {
+            "client": {"clientName": "WEB", "clientVersion": "2.20250903.04.00"}
+        }
+        self.URL = (
+            "https://www.youtube.com/youtubei/v1/get_transcript?prettyPrint=false"
+        )
+        self.languages: dict[YouTubeVideoID, LanguageList] = {}
+
+    def initialise_session(self):
+        """Set up the session with appropriate headers and retry strategy."""
         self.session.headers.update(
             {
                 "Content-Type": "application/json",
@@ -29,7 +40,7 @@ class YouTubeTranscriptFetcher:
         )
         # Configure retries with exponential backoff for transient errors and rate limiting
         # Sometimes (roughly 1% of requests) we get a 400 Bad Request despite the video ID being valid
-        # and the request being well-formed - seems to be a gRPC FAILED_PRECONDITION error from YouTube.
+        # and the request being well-formed - seems to be a gRPC FAILED_PRECONDITION error from YouTube (#3).
         # Retrying a few times seems to mitigate this issue for now.
         retry = Retry(
             total=5,
@@ -52,14 +63,6 @@ class YouTubeTranscriptFetcher:
         self.session.mount("https://", adapter)
         self.session.mount("http://", adapter)
 
-        self._context = {
-            "client": {"clientName": "WEB", "clientVersion": "2.20250903.04.00"}
-        }
-        self.URL = (
-            "https://www.youtube.com/youtubei/v1/get_transcript?prettyPrint=false"
-        )
-        self.languages: dict[YouTubeVideoID, LanguageList] = {}
-
     def get_transcript(self, video_id, language="en"):
         """Fetch the transcript for a given YouTube video in the specified language."""
         # if we have already fetched the languages for this video, use it
@@ -74,7 +77,7 @@ class YouTubeTranscriptFetcher:
             raise NoTranscriptError(
                 f"No transcript available for video {video_id} in language {language}."
             )
-        
+
         request_data = {
             "context": self._context,
             "params": lang._continuation_token,
@@ -95,12 +98,14 @@ class YouTubeTranscriptFetcher:
             response = self.session.post(self.URL, json=request_data, timeout=10)
             response.raise_for_status()
         except requests.RequestException as e:
-            if hasattr(e, 'response') and e.response.status_code == 400:
+            if hasattr(e, "response") and e.response.status_code == 400:
                 raise VideoNotFoundError(
                     f"Couldn't find transcript for video {video_id}. "
                     "Please check the video ID exists and is accessible."
                 ) from e
-            raise Exception(f"Failed to fetch languages for video {video_id}: {e}") from e
+            raise Exception(
+                f"Failed to fetch languages for video {video_id}: {e}"
+            ) from e
         response_data = response.json()
         self.languages[video_id] = LanguageList.from_response(response_data)
         return self.languages[video_id]
