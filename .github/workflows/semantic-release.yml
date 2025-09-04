@@ -7,6 +7,15 @@ on:
         description: 'Dry run (no tag / no publish)'
         required: false
         default: 'false'
+      force:
+        type: choice
+        description: 'Force release even if no relevant changes'
+        required: false
+        options:
+          - 'prerelease'
+          - 'patch'
+          - 'minor'
+          - 'major'
   workflow_run:
     workflows: [Run Tests]
     types: [completed]
@@ -71,6 +80,8 @@ jobs:
         uses: python-semantic-release/python-semantic-release@v10.3.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          force: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.force || '' }}
+          changelog: true
           git_committer_name: github-actions
           git_committer_email: actions@users.noreply.github.com
           no_operation_mode: ${{ steps.mode.outputs.noop }}
