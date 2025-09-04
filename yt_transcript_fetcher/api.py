@@ -1,10 +1,10 @@
-from encodings.punycode import T
-from typing import Optional
 import requests
-from yt_transcript_fetcher.exceptions import NoTranscriptError, VideoNotFoundError
-from yt_transcript_fetcher.protobuf import generate_params
-from yt_transcript_fetcher.models import LanguageList, Transcript
+from requests.adapters import HTTPAdapter
+from urllib3 import Retry
 
+from yt_transcript_fetcher.exceptions import NoTranscriptError, VideoNotFoundError
+from yt_transcript_fetcher.models import LanguageList, Transcript
+from yt_transcript_fetcher.protobuf import generate_params
 
 YouTubeVideoID = str
 """Type alias for YouTube video ID, which is a string."""
@@ -16,7 +16,42 @@ class YouTubeTranscriptFetcher:
     def __init__(self, session=None):
         """Initialize the YouTubeTranscriptFetcher with an optional session."""
         self.session = session or requests.Session()
-        self.session.headers.update({"Content-Type": "application/json"})
+        # Set default headers to mimic a browser request
+        self.session.headers.update(
+            {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "User-Agent": (
+                    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                    "(KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.3"
+                ),
+            }
+        )
+        # Configure retries with exponential backoff for transient errors and rate limiting
+        # Sometimes (roughly 1% of requests) we get a 400 Bad Request despite the video ID being valid
+        # and the request being well-formed - seems to be a gRPC FAILED_PRECONDITION error from YouTube.
+        # Retrying a few times seems to mitigate this issue for now.
+        retry = Retry(
+            total=5,
+            connect=3,
+            read=3,
+            backoff_factor=0.3,
+            status_forcelist=(
+                500,
+                502,
+                503,
+                504,
+                429,
+                400,
+            ),
+            allowed_methods=frozenset(["POST"]),
+            raise_on_status=False,
+            respect_retry_after_header=True,
+        )
+        adapter = HTTPAdapter(max_retries=retry)
+        self.session.mount("https://", adapter)
+        self.session.mount("http://", adapter)
+
         self._context = {
             "client": {"clientName": "WEB", "clientVersion": "2.20250903.04.00"}
         }
