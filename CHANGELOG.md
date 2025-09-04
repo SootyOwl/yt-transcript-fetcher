@@ -16,14 +16,6 @@
   ([`07a3452`](https://github.com/SootyOwl/yt-transcript-fetcher/commit/07a34525ebf7b17998c972b33513af624342a023))
 
 
-## Unreleased
-
-### Documentation
-
-- **README**: Reorder badges for better visibility
-  ([`07a3452`](https://github.com/SootyOwl/yt-transcript/commit/07a34525ebf7b17998c972b33513af624342a023))
-
-
 ## v1.1.4 (2025-09-04)
 
 ### Chores
