@@ -1,7 +1,10 @@
+# yt-transcript-fetcher | YouTube Transcript Fetcher
+
 [![Run Tests](https://github.com/SootyOwl/yt-transcript-fetcher/actions/workflows/run-tests.yml/badge.svg)](https://github.com/SootyOwl/yt-transcript-fetcher/actions/workflows/run-tests.yml)
-
-
-# yt-transcript-fetcher
+[![PyPI - Version](https://img.shields.io/pypi/v/yt-transcript-fetcher)](https://pypi.org/project/yt-transcript-fetcher/)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/yt-transcript-fetcher)
+![PyPI - License](https://img.shields.io/pypi/l/yt-transcript-fetcher)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/yt-transcript-fetcher)
 
 A python package to fetch YouTube video transcripts.
 
