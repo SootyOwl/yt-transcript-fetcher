@@ -41,6 +41,12 @@ dependencies = ["requests (>=2.32.4,<3.0.0)"]
 [project.scripts]
 yt-transcript = "yt_transcript.cli:main"
 
+[project.urls]
+source = "https://github.com/SootyOwl/yt-transcript-fetcher"
+issues = "https://github.com/SootyOwl/yt-transcript-fetcher/issues"
+releasenotes = "https://github.com/SootyOwl/yt-transcript-fetcher/releases"
+changelog = "https://github.com/SootyOwl/yt-transcript-fetcher/blob/main/CHANGELOG.md"
+
 [dependency-groups]
 dev = [
     "pytest>=8.4.0,<9",
@@ -65,6 +71,9 @@ build_command = """
     uv build
 """
 commit_parser = "conventional"
+
+[tool.semantic_release.default_templates.changelog]
+changelog_file = "CHANGELOG.md"
 
 [tool.semantic_release.commit_parser_options]
 minor_tags = ["feat"]
