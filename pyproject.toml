@@ -45,6 +45,10 @@ patch_tags = ["fix", "perf"]
 parse_squash_commits = true
 ignore_merge_commits = true
 
+[tool.semantic_release.branches.main]
+match = "^main$"
+prerelease = false
+
 [tool.semantic_release.branches.alpha]
 # Matches branches with the prefixes 'feat/', 'fix/', or 'perf/'.
 match = "^(feat|fix|perf)/.+"
