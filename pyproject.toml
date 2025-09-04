@@ -6,7 +6,21 @@ authors = [{ name = "Dan Eagle", email = "dan@tyto.cc" }]
 requires-python = ">=3.9,<4.0"
 readme = "README.md"
 license = { text = "MIT" }
-keywords = ["youtube", "transcript", "yt-transcript", "yt", "video", "subtitle"]
+keywords = [
+    "youtube",
+    "transcript",
+    "transcripts",
+    "subtitle",
+    "subtitles",
+    "caption",
+    "captions",
+    "yt-transcript",
+    "yt",
+    "video",
+    "youtube-api",
+    "youtube-subtitles",
+    "youtube-transcripts",
+]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -16,6 +30,11 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Multimedia :: Video",
 ]
 dependencies = ["requests (>=2.32.4,<3.0.0)"]
 
