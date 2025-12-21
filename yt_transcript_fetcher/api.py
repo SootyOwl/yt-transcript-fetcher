@@ -19,7 +19,7 @@ class YouTubeTranscriptFetcher:
         # Set default headers to mimic a browser request
         self.initialise_session()
         self._context = {
-            "client": {"clientName": "WEB", "clientVersion": "2.20250903.04.00"}
+            "client": {"clientName": "WEB", "clientVersion": "2.20241219.04.00"}
         }
         self.URL = (
             "https://www.youtube.com/youtubei/v1/get_transcript?prettyPrint=false"
