@@ -52,6 +52,7 @@ CHANGELOG = "https://github.com/SootyOwl/yt-transcript-fetcher/blob/main/CHANGEL
 
 [dependency-groups]
 dev = [
+    "ipykernel>=6.31.0",
     "pytest>=8.4.0,<9",
     "pytest-repeat>=0.9.4",
     "pytest-xdist>=3.8.0",
