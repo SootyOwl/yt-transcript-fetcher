@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Union
 
 from yt_transcript_fetcher.exceptions import NoLanguageError, NoSegmentsError
-from yt_transcript_fetcher.protobuf import get_video_id, is_asr_captions, retrieve_language_code
+from yt_transcript_fetcher.protobuf import generate_params, get_video_id, is_asr_captions, retrieve_language_code
 
 
 def safe_get(data, path, default=None):
@@ -127,6 +127,63 @@ class LanguageList:
                         )
         return cls(languages=languages)
 
+    @classmethod
+    def from_player_response(cls, response_data, video_id):
+        """Create a LanguageList from a /player API response.
+        
+        The /player API returns caption tracks in a different format than
+        the /get_transcript API. Each track has languageCode, name, and kind.
+        
+        Args:
+            response_data: The JSON response from /player API.
+            video_id: The video ID (needed for generating params).
+            
+        Returns:
+            LanguageList: A list of available languages.
+        """
+        languages = []
+        
+        captions = response_data.get("captions", {})
+        pctr = captions.get("playerCaptionsTracklistRenderer", {})
+        caption_tracks = pctr.get("captionTracks", [])
+        
+        for track in caption_tracks:
+            lang_code = track.get("languageCode", "")
+            if not lang_code:
+                continue
+                
+            # Extract name from runs or simpleText format
+            name_obj = track.get("name", {})
+            if isinstance(name_obj, dict):
+                runs = name_obj.get("runs", [])
+                if runs:
+                    display_name = runs[0].get("text", lang_code)
+                else:
+                    display_name = name_obj.get("simpleText", lang_code)
+            else:
+                display_name = str(name_obj) if name_obj else lang_code
+            
+            # kind == "asr" means auto-generated (Automatic Speech Recognition)
+            is_auto_generated = track.get("kind") == "asr"
+            
+            # Generate continuation token for /get_transcript API
+            continuation_token = generate_params(
+                video_id=video_id,
+                language=lang_code,
+                auto_generated=is_auto_generated
+            )
+            
+            languages.append(
+                Language(
+                    code=lang_code,
+                    display_name=display_name,
+                    is_auto_generated=is_auto_generated,
+                    _continuation_token=continuation_token,
+                )
+            )
+        
+        return cls(languages=languages)
+
 
 @dataclass
 class Segment:
@@ -191,9 +248,25 @@ class Segment:
         start_ms = segment_dict.get("startMs", "0")
         end_ms = segment_dict.get("endMs", "0")
         snippet = segment_dict.get("snippet", {})
+        
+        # Handle both formats:
+        # 1. WEB format: snippet.runs[].text
+        # 2. Android/iOS format: snippet.elementsAttributedString.content
         runs = snippet.get("runs", [])
-        text = " ".join(run.get("text", "") for run in runs if "text" in run)
-        start_time_text = segment_dict.get("startTimeText", {}).get("simpleText", "")
+        if runs:
+            text = " ".join(run.get("text", "") for run in runs if "text" in run)
+        else:
+            # Android/iOS elementsCommand format
+            text = snippet.get("elementsAttributedString", {}).get("content", "")
+        
+        # Handle both startTimeText formats
+        start_time_text_data = segment_dict.get("startTimeText", {})
+        if isinstance(start_time_text_data, dict):
+            start_time_text = start_time_text_data.get("simpleText", "") or \
+                              start_time_text_data.get("elementsAttributedString", {}).get("content", "")
+        else:
+            start_time_text = ""
+        
         accessibility = segment_dict.get("accessibility", {})
         accessibility_label = accessibility.get("accessibilityData", {}).get(
             "label", ""
@@ -266,13 +339,36 @@ class SegmentList:
 
     @classmethod
     def from_response(cls, response_data):
+        """Create a SegmentList from a response dictionary.
+        
+        Handles two response formats:
+        1. WEB format: actions[0].updateEngagementPanelAction.content...
+        2. Android/iOS format: actions[0].elementsCommand.transformEntityCommand...
+        """
+        initial_transcript_parts = []
+        
+        # Try WEB format first (updateEngagementPanelAction)
         initial_transcript_parts = safe_get(
             response_data,
             "actions.0.updateEngagementPanelAction.content.transcriptRenderer.content.transcriptSearchPanelRenderer.body.transcriptSegmentListRenderer.initialSegments",
             [],
         )
+        
+        # If WEB format didn't work, try Android/iOS format (elementsCommand)
+        if not initial_transcript_parts:
+            actions = response_data.get("actions", [])
+            if actions:
+                action = actions[0]
+                elements_cmd = action.get("elementsCommand", {})
+                transform_cmd = elements_cmd.get("transformEntityCommand", {})
+                arguments = transform_cmd.get("arguments", {})
+                transform_args = arguments.get("transformTranscriptSegmentListArguments", {})
+                overwrite = transform_args.get("overwrite", {})
+                initial_transcript_parts = overwrite.get("initialSegments", [])
+        
         if not initial_transcript_parts:
             raise NoSegmentsError("No transcript segments found in the response data.")
+        
         segments = []
         for segment_dict in initial_transcript_parts:
             segment = Segment.from_dict(

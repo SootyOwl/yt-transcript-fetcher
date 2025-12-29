@@ -1,5 +1,137 @@
 import base64
+import random
+import string
+import time
 import urllib.parse
+
+
+def _encode_varint(value):
+    """Encode an integer as a protobuf varint (variable-length integer)."""
+    result = []
+    while value > 127:
+        result.append((value & 0x7F) | 0x80)
+        value >>= 7
+    result.append(value & 0x7F)
+    return bytes(result)
+
+
+def generate_visitor_id(length=11):
+    """Generate a random visitor ID string (11 characters like YouTube.js uses)."""
+    # YouTube.js uses alphanumeric characters for visitor IDs
+    chars = string.ascii_letters + string.digits + "-_"
+    return "".join(random.choice(chars) for _ in range(length))
+
+
+def encode_visitor_data(visitor_id=None, timestamp=None):
+    """
+    Encode visitor data as a protobuf message, matching YouTube.js VisitorData format.
+    
+    The VisitorData protobuf message has:
+    - Field 1 (string): id - An 11-character random string
+    - Field 5 (int64): timestamp - Unix timestamp in seconds
+    
+    This is then base64url encoded (with URL-safe characters) and URL-encoded.
+    
+    Args:
+        visitor_id: Optional visitor ID string. If not provided, generates a random one.
+        timestamp: Optional Unix timestamp. If not provided, uses current time.
+    
+    Returns:
+        URL-encoded base64url string of the protobuf message.
+    
+    Reference: https://github.com/LuanRT/YouTube.js/blob/main/src/utils/ProtoUtils.ts
+    """
+    if visitor_id is None:
+        visitor_id = generate_visitor_id()
+    if timestamp is None:
+        timestamp = int(time.time())
+    
+    result = b""
+    
+    # Field 1: visitor ID string (wire type 2 = length-delimited)
+    # Format: (field_number << 3) | wire_type = (1 << 3) | 2 = 10
+    id_bytes = visitor_id.encode("utf-8")
+    result += bytes([10])  # field header
+    result += _encode_varint(len(id_bytes))
+    result += id_bytes
+    
+    # Field 5: timestamp as int64 (wire type 0 = varint)
+    # Format: (field_number << 3) | wire_type = (5 << 3) | 0 = 40
+    result += bytes([40])  # field header
+    result += _encode_varint(timestamp)
+    
+    # Base64 encode with URL-safe characters
+    base64_string = base64.b64encode(result).decode("ascii")
+    # Replace +/ with -_ for URL-safe base64url format
+    base64url_string = base64_string.replace("+", "-").replace("/", "_")
+    # URL encode
+    return urllib.parse.quote(base64url_string)
+
+
+def decode_visitor_data(encoded_visitor_data):
+    """
+    Decode an encoded visitor data string back to (visitor_id, timestamp).
+    
+    This is the inverse of encode_visitor_data().
+    
+    Args:
+        encoded_visitor_data: URL-encoded base64url string of the protobuf message.
+    
+    Returns:
+        Tuple of (visitor_id: str, timestamp: int)
+    """
+    # URL decode
+    base64url_string = urllib.parse.unquote(encoded_visitor_data)
+    # Replace URL-safe chars back to standard base64
+    base64_string = base64url_string.replace("-", "+").replace("_", "/")
+    # Add padding if needed
+    padding = 4 - (len(base64_string) % 4)
+    if padding != 4:
+        base64_string += "=" * padding
+    # Base64 decode
+    protobuf_bytes = base64.b64decode(base64_string)
+    
+    visitor_id = None
+    timestamp = None
+    i = 0
+    
+    while i < len(protobuf_bytes):
+        if i >= len(protobuf_bytes):
+            break
+        field_header = protobuf_bytes[i]
+        field_number = field_header >> 3
+        wire_type = field_header & 0x07
+        i += 1
+        
+        if wire_type == 2:  # Length-delimited (string)
+            length, bytes_read = _decode_varint(protobuf_bytes, i)
+            i += bytes_read
+            value = protobuf_bytes[i:i + length].decode("utf-8")
+            i += length
+            if field_number == 1:
+                visitor_id = value
+        elif wire_type == 0:  # Varint
+            value, bytes_read = _decode_varint(protobuf_bytes, i)
+            i += bytes_read
+            if field_number == 5:
+                timestamp = value
+    
+    return visitor_id, timestamp
+
+
+def _decode_varint(data, offset):
+    """Decode a protobuf varint starting at offset. Returns (value, bytes_read)."""
+    result = 0
+    shift = 0
+    bytes_read = 0
+    while offset + bytes_read < len(data):
+        byte = data[offset + bytes_read]
+        result |= (byte & 0x7F) << shift
+        bytes_read += 1
+        if (byte & 0x80) == 0:
+            break
+        shift += 7
+    return result, bytes_read
 
 
 # region: protobuf encoding helpers

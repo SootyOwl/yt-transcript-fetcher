@@ -21,6 +21,13 @@ class NoLanguageError(Exception):
         self.message = message
         super().__init__(self.message)
 
+class YouTubeAPIError(Exception):
+    """Exception raised for errors returned by the YouTube API."""
+
+    def __init__(self, message="An error occurred with the YouTube API."):
+        self.message = message
+        super().__init__(self.message)
+
 class VideoNotFoundError(Exception):
     """Exception raised when a YouTube video is not found."""
 

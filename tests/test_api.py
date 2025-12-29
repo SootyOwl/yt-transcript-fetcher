@@ -28,7 +28,8 @@ def test_list_languages_no_video(fetcher):
     """Test listing languages for a non-existent YouTube video."""
     with pytest.raises(VideoNotFoundError) as exc_info:
         fetcher.list_languages("11111111111")
-    assert "Couldn't find transcript for video 11111111111. Please check the video ID exists and is accessible." in str(exc_info.value)
+    assert "11111111111" in str(exc_info.value)
+    assert "not playable" in str(exc_info.value) or "not found" in str(exc_info.value).lower()
 
 def test_get_transcript(fetcher):
     """Test fetching a transcript for a YouTube video."""
@@ -44,7 +45,8 @@ def test_get_transcript_no_video(fetcher):
     """Test fetching a transcript for a non-existent YouTube video."""
     with pytest.raises(VideoNotFoundError) as exc_info:
         fetcher.get_transcript("11111111111", "en")
-    assert "Couldn't find transcript for video 11111111111. Please check the video ID exists and is accessible." in str(exc_info.value)
+    assert "11111111111" in str(exc_info.value)
+    assert "not playable" in str(exc_info.value) or "not found" in str(exc_info.value).lower()
 
 def test_get_transcript_no_language(fetcher):
     """Test fetching a transcript for a video with no available language."""
