@@ -1,6 +1,6 @@
 [project]
 name = "yt-transcript-fetcher"
-version = "1.2.0"
+version = "1.2.1"
 description = "This library can be used to fetch transcripts for YouTube videos"
 authors = [{ name = "Dan Eagle", email = "dan@tyto.cc" }]
 requires-python = ">=3.9,<4.0"

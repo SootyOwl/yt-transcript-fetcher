@@ -2,6 +2,22 @@
 
 <!-- version list -->
 
+## v1.2.1 (2025-12-29)
+
+### Bug Fixes
+
+- **api**: Fix 400 error precondition failed
+  ([`81b99af`](https://github.com/SootyOwl/yt-transcript-fetcher/commit/81b99af957757112aaf79090d84a51600e7a61f0))
+
+### Chores
+
+- **dev**: Add ipykernel dependency
+  ([`6295568`](https://github.com/SootyOwl/yt-transcript-fetcher/commit/6295568818a8e9abbdf5b6d0dc3fa854e36d21ce))
+
+- **notebook**: Add troubleshooting notebook
+  ([`58c3d85`](https://github.com/SootyOwl/yt-transcript-fetcher/commit/58c3d85c25edfc910c2cfafb336c923d4fd0771e))
+
+
 ## v1.2.0 (2025-09-04)
 
 ### Documentation
