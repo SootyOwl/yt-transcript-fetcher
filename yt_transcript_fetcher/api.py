@@ -128,7 +128,7 @@ class YouTubeTranscriptFetcher:
 
     def list_languages(self, video_id) -> LanguageList:
         """Fetch all available languages for a given YouTube video.
-        
+
         Uses the /player API to get caption tracks, which provides language
         information without requiring attestation (PO Token).
         """
@@ -143,8 +143,15 @@ class YouTubeTranscriptFetcher:
             "contentCheckOk": True,
             "racyCheckOk": True,
         }
+
+        # Add Android-specific headers required for the /player API
+        headers = {
+            "X-Youtube-Client-Name": "3",  # 3 = ANDROID client
+            "X-Youtube-Client-Version": self.CLIENT["clientVersion"],
+        }
+
         try:
-            response = self.session.post(self.PLAYER_URL, json=request_data, timeout=15)
+            response = self.session.post(self.PLAYER_URL, json=request_data, headers=headers, timeout=15)
             response.raise_for_status()
         except requests.RequestException as e:
             if hasattr(e, "response") and e.response is not None:
