@@ -3,7 +3,7 @@ from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
 from yt_transcript_fetcher.exceptions import NoTranscriptError, VideoNotFoundError, YouTubeAPIError
-from yt_transcript_fetcher.models import LanguageList, Transcript
+from yt_transcript_fetcher.models import LanguageList, SegmentList, Transcript
 from yt_transcript_fetcher.protobuf import encode_visitor_data, generate_params
 
 YouTubeVideoID = str
@@ -109,7 +109,20 @@ class YouTubeTranscriptFetcher:
                 f"No transcript available for video {video_id} in language {language}."
             )
 
-        # Generate params with correct auto_generated flag based on caption type
+        # Use the direct baseUrl from the player response when available.
+        # This bypasses the /get_transcript API endpoint which has been returning
+        # FAILED_PRECONDITION errors due to YouTube API changes.
+        if lang._base_url:
+            url = lang._base_url + "&fmt=json3"
+            response = self.session.get(url, timeout=10)
+            response.raise_for_status()
+            return Transcript(
+                video_id=video_id,
+                language=lang,
+                segments=SegmentList.from_timedtext(response.json()),
+            )
+
+        # Fall back to the /get_transcript API (for languages without a baseUrl)
         params = generate_params(
             video_id=video_id,
             language=lang.code,

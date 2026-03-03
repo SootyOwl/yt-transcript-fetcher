@@ -102,6 +102,79 @@ def test_language_list_from_response(sample_response):
 
 
 @pytest.fixture
+def sample_player_response():
+    """Fixture with a minimal /player API response containing caption tracks."""
+    return {
+        "playabilityStatus": {"status": "OK"},
+        "captions": {
+            "playerCaptionsTracklistRenderer": {
+                "captionTracks": [
+                    {
+                        "baseUrl": "https://www.youtube.com/api/timedtext?v=dQw4w9WgXcQ&lang=en",
+                        "name": {"simpleText": "English"},
+                        "languageCode": "en",
+                        "kind": "asr",
+                    }
+                ]
+            }
+        },
+    }
+
+
+def test_language_list_from_player_response(sample_player_response):
+    """Test creating a LanguageList from a /player API response."""
+    language_list = LanguageList.from_player_response(sample_player_response, "dQw4w9WgXcQ")
+
+    assert len(language_list.languages) == 1
+    lang = language_list.languages[0]
+    assert lang.code == "en"
+    assert lang.display_name == "English"
+    assert lang.is_auto_generated is True
+    assert lang._base_url == "https://www.youtube.com/api/timedtext?v=dQw4w9WgXcQ&lang=en"
+    assert lang._continuation_token is not None
+
+
+@pytest.fixture
+def sample_timedtext_response():
+    """Fixture with a sample timedtext JSON3 response."""
+    return {
+        "wireMagic": "pb3",
+        "events": [
+            {"tStartMs": 0, "dDurationMs": 500, "id": 1, "wpWinPts": 1},
+            {"tStartMs": 1360, "dDurationMs": 1680, "segs": [{"utf8": "[♪♪♪]"}]},
+            {"tStartMs": 3040, "dDurationMs": 2000, "segs": [{"utf8": "Never gonna give you up"}]},
+            {"tStartMs": 5040, "dDurationMs": 500, "segs": [{"utf8": "\n"}]},
+        ],
+    }
+
+
+def test_segment_list_from_timedtext(sample_timedtext_response):
+    """Test creating a SegmentList from a timedtext JSON3 response."""
+    segment_list = SegmentList.from_timedtext(sample_timedtext_response)
+
+    # Fixture has 4 events: 1 without segs, 2 with text, 1 with only \n
+    # Only the 2 events with non-empty text should produce segments
+    assert len(segment_list) == 2
+    assert segment_list[0].start_ms == 1360
+    assert segment_list[0].end_ms == 3040
+    assert segment_list[0].text == "[♪♪♪]"
+    assert segment_list[0].start_time_text == "0:01"
+    assert segment_list[1].start_ms == 3040
+    assert segment_list[1].text == "Never gonna give you up"
+
+
+def test_segment_list_from_timedtext_no_segments():
+    """Test that from_timedtext raises NoSegmentsError when there are no valid events."""
+    from yt_transcript_fetcher.exceptions import NoSegmentsError
+
+    with pytest.raises(NoSegmentsError):
+        SegmentList.from_timedtext({"events": []})
+
+    with pytest.raises(NoSegmentsError):
+        SegmentList.from_timedtext({"events": [{"tStartMs": 0, "dDurationMs": 500}]})
+
+
+@pytest.fixture
 def segment_dict():
     """Fixture to create a sample segment dictionary."""
     return {

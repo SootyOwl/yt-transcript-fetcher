@@ -32,6 +32,8 @@ class Language:
     """Indicates if the transcript is auto-generated (ASR)."""
     _continuation_token: str = None
     """Can be used to fetch the transcript in this language."""
+    _base_url: str = None
+    """Direct URL to fetch the transcript (from the player API baseUrl)."""
 
     def __str__(self):
         return f"{self.display_name} ({self.code})"
@@ -179,6 +181,7 @@ class LanguageList:
                     display_name=display_name,
                     is_auto_generated=is_auto_generated,
                     _continuation_token=continuation_token,
+                    _base_url=track.get("baseUrl"),
                 )
             )
         
@@ -376,6 +379,51 @@ class SegmentList:
             )
             segments.append(segment)
         return cls(segments=segments)
+
+    @classmethod
+    def from_timedtext(cls, response_data: dict) -> "SegmentList":
+        """Create a SegmentList from a timedtext JSON3 response.
+
+        This format is returned by the caption track's baseUrl when ``fmt=json3``
+        is requested, and is used as the primary transcript source to avoid
+        FAILED_PRECONDITION errors from the /get_transcript API endpoint.
+
+        Args:
+            response_data: The JSON3 response from the timedtext URL.
+
+        Returns:
+            SegmentList: A list of transcript segments.
+        """
+        events = response_data.get("events", [])
+        segments = []
+        for event in events:
+            # Events without "segs" are formatting/timing-only events; skip them
+            segs = event.get("segs")
+            if not segs:
+                continue
+            start_ms = event.get("tStartMs", 0)
+            # dDurationMs is YouTube's API field for event duration in milliseconds
+            duration_ms = event.get("dDurationMs", 0)
+            end_ms = start_ms + duration_ms
+            text = "".join(seg.get("utf8", "") for seg in segs).strip()
+            if not text:
+                continue
+            total_seconds = start_ms // 1000
+            minutes = total_seconds // 60
+            seconds = total_seconds % 60
+            start_time_text = f"{minutes}:{seconds:02d}"
+            segments.append(
+                Segment(
+                    start_ms=start_ms,
+                    end_ms=end_ms,
+                    text=text,
+                    start_time_text=start_time_text,
+                )
+            )
+        if not segments:
+            raise NoSegmentsError("No transcript segments found in the timedtext response.")
+        return cls(segments=segments)
+
 
     def get_segment_by_time(self, time_ms):
         """Get the segment that contains the specified time in milliseconds."""
