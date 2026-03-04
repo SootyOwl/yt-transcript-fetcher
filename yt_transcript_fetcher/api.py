@@ -121,13 +121,7 @@ class YouTubeTranscriptFetcher:
             "params": params,
         }
 
-        # Add Android-specific headers for consistency
-        headers = {
-            "X-Youtube-Client-Name": "3",  # 3 = ANDROID client
-            "X-Youtube-Client-Version": self.CLIENT["clientVersion"],
-        }
-
-        response = self.session.post(self.URL, json=request_data, headers=headers, timeout=10)
+        response = self.session.post(self.URL, json=request_data, timeout=10)
         response.raise_for_status()
         response_data = response.json()
         return Transcript.from_response(lang, response_data)
@@ -150,14 +144,8 @@ class YouTubeTranscriptFetcher:
             "racyCheckOk": True,
         }
 
-        # Add Android-specific headers required for the /player API
-        headers = {
-            "X-Youtube-Client-Name": "3",  # 3 = ANDROID client
-            "X-Youtube-Client-Version": self.CLIENT["clientVersion"],
-        }
-
         try:
-            response = self.session.post(self.PLAYER_URL, json=request_data, headers=headers, timeout=15)
+            response = self.session.post(self.PLAYER_URL, json=request_data, timeout=15)
             response.raise_for_status()
         except requests.RequestException as e:
             if hasattr(e, "response") and e.response is not None:
