@@ -14,15 +14,17 @@ class YouTubeTranscriptFetcher:
     """A class to fetch YouTube video transcripts and available languages."""
 
     # Client configuration for YouTube's internal API
-    # Using older Android version (19.09.37) to avoid attestation (PO Token) requirement
-    # Newer versions (20.x) and WEB clients require attestation which cannot be
-    # generated in pure Python. See: https://github.com/LuanRT/YouTube.js/issues/1102
+    # As of March 2026, using iOS client which doesn't require attestation (PO Token)
+    # Android clients started requiring attestation again, but iOS still works
+    # See: https://github.com/yt-dlp/yt-dlp/issues/10085
     CLIENT = {
-        "clientName": "ANDROID",
-        "clientVersion": "19.09.37",
-        "userAgent": "com.google.android.youtube/19.09.37 (Linux; U; Android 11) gzip",
-        "osName": "Android",
-        "osVersion": "11",
+        "clientName": "IOS",
+        "clientVersion": "19.16.3",
+        "userAgent": "com.google.ios.youtube/19.16.3 (iPhone16,2; U; CPU iOS 17_5_1 like Mac OS X;)",
+        "deviceMake": "Apple",
+        "deviceModel": "iPhone16,2",
+        "osName": "iOS",
+        "osVersion": "17.5.1.21F90",
     }
 
     def __init__(self, session=None):
@@ -46,10 +48,10 @@ class YouTubeTranscriptFetcher:
         if not session:
             self.initialise_session()
         self.URL = (
-            "https://www.youtube.com/youtubei/v1/get_transcript?prettyPrint=false"
+            "https://www.youtube.com/youtubei/v1/get_transcript?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&prettyPrint=false"
         )
         self.PLAYER_URL = (
-            "https://www.youtube.com/youtubei/v1/player?prettyPrint=false"
+            "https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&prettyPrint=false"
         )
         self.languages: dict[YouTubeVideoID, LanguageList] = {}
 
@@ -128,7 +130,7 @@ class YouTubeTranscriptFetcher:
 
     def list_languages(self, video_id) -> LanguageList:
         """Fetch all available languages for a given YouTube video.
-        
+
         Uses the /player API to get caption tracks, which provides language
         information without requiring attestation (PO Token).
         """
@@ -143,6 +145,7 @@ class YouTubeTranscriptFetcher:
             "contentCheckOk": True,
             "racyCheckOk": True,
         }
+
         try:
             response = self.session.post(self.PLAYER_URL, json=request_data, timeout=15)
             response.raise_for_status()
