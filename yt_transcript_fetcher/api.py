@@ -121,7 +121,13 @@ class YouTubeTranscriptFetcher:
             "params": params,
         }
 
-        response = self.session.post(self.URL, json=request_data, timeout=10)
+        # Add Android-specific headers for consistency
+        headers = {
+            "X-Youtube-Client-Name": "3",  # 3 = ANDROID client
+            "X-Youtube-Client-Version": self.CLIENT["clientVersion"],
+        }
+
+        response = self.session.post(self.URL, json=request_data, headers=headers, timeout=10)
         response.raise_for_status()
         response_data = response.json()
         return Transcript.from_response(lang, response_data)
