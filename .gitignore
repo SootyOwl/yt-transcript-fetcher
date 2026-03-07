@@ -198,3 +198,4 @@ get_transcript.py
 test_protobuf_flags_content.py
 test_protobuf_flags_structure.py
 post-test.sh
+bgutil-pot
