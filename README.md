@@ -69,14 +69,31 @@ in milliseconds on `start_ms`/`end_ms`, and seconds on `start`/`end`. The parser
 checks the returned video and caption track and rejects incomplete or malformed
 timing data instead of returning an incorrectly labelled transcript.
 
-This fix preserves the previous exception and retry behavior. Language discovery
-still maps HTTP failures to `VideoNotFoundError`, except JSON
-`FAILED_PRECONDITION` errors, which raise `YouTubeAPIError`. Transcript HTTP
-failures propagate as `requests.HTTPError`. Default sessions retain retries for
-HTTP 400, HTTP 429 and transient server failures, respecting `Retry-After`.
-Invalid modern panel selection or timing data raises `YouTubeAPIError` from
-`yt_transcript_fetcher.exceptions`. Revised transport exceptions and removal of
-HTTP 400 retries are reserved for a separate breaking release.
+Unavailable videos and missing languages retain the existing named errors.
+Protocol failures raise `YouTubeAPIError` from `yt_transcript_fetcher.exceptions`.
+Rate-limit and server HTTP failures propagate as `requests.HTTPError` after
+retries; they are no longer misreported as missing videos. Default sessions
+retry transient failures and HTTP 429, respecting `Retry-After`, but do not retry
+HTTP 400 precondition failures.
+
+### Breaking error-contract migration
+
+The transcript fix on `fix/modern-transcript-panel` retains the previous errors
+and retry policy. This branch, `feat/transcript-error-contract`, adds these
+changes for the subsequent major release:
+
+| Condition | Previous behavior | New behavior |
+| --- | --- | --- |
+| Discovery HTTP failure other than 404/precondition | `VideoNotFoundError` | `requests.HTTPError` |
+| Discovery connection failure/timeout | Wrapped in `Exception` | Original `requests` exception |
+| Transcript HTTP 400 `FAILED_PRECONDITION` | `requests.HTTPError` | `YouTubeAPIError` |
+| Invalid JSON/API response or missing panel | Decode, availability, or missing-segment error | `YouTubeAPIError` |
+| HTTP 400 retry | Retried by default | Not retried |
+
+Update error handlers to catch `requests.RequestException` for transport
+failures and `YouTubeAPIError` for protocol failures. Discovery HTTP 404 and
+unplayable videos still raise `VideoNotFoundError`; missing languages still
+raise `NoTranscriptError`. Caller-supplied session retry configuration is kept.
 
 This uses an undocumented API and may need updates as YouTube changes. Successful
 requests do not establish the rate limit on a Discord bot's hosting network;

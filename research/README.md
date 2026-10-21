@@ -154,11 +154,13 @@ response shapes rather than exposing partial results. Translation and paginated
 transcript retrieval have not been established by this investigation. Private,
 authenticated, and restricted-content behavior has not been validated live.
 
-The existing public API remains unchanged, including its first matching
+The public call signatures remain unchanged, including first matching
 language-code selection. Upstream segment grouping differs. The transcript fix
-retains the previous exception behavior and HTTP 400 retries. Transport error
-corrections and the retry-policy change are separated onto a dependent branch
-for a later breaking release. No package release has been published as part of
+on `fix/modern-transcript-panel` retains the previous exception behavior and
+HTTP 400 retries. This dependent branch, `feat/transcript-error-contract`,
+restores the improved transport/protocol errors and removes default HTTP 400
+retries for a subsequent major release. See the README migration table for the
+complete exception changes. No package release has been published as part of
 this work.
 
 The remaining operational question is rate limiting on the actual Discord host.

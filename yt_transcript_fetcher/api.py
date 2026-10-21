@@ -76,7 +76,6 @@ class YouTubeTranscriptFetcher:
                 503,
                 504,
                 429,
-                400,
             ),
             allowed_methods=frozenset(["POST"]),
             raise_on_status=False,
@@ -85,6 +84,25 @@ class YouTubeTranscriptFetcher:
         adapter = HTTPAdapter(max_retries=retry)
         self.session.mount("https://", adapter)
         self.session.mount("http://", adapter)
+
+    def _post(self, url, request_data, timeout):
+        response = self.session.post(url, json=request_data, timeout=timeout)
+        if response.status_code == 400:
+            try:
+                error_data = response.json()
+            except ValueError:
+                error_data = None
+            if isinstance(error_data, dict) and isinstance(error_data.get("error"), dict):
+                if error_data["error"].get("status") == "FAILED_PRECONDITION":
+                    raise YouTubeAPIError("YouTube API precondition failed for the current client request.")
+        response.raise_for_status()
+        try:
+            data = response.json()
+        except ValueError as error:
+            raise YouTubeAPIError("YouTube returned an invalid JSON response.") from error
+        if not isinstance(data, dict) or "error" in data:
+            raise YouTubeAPIError("YouTube returned an invalid API response.")
+        return data
 
     def get_transcript(self, video_id, language="en"):
         """Fetch the transcript for a given YouTube video in the specified language."""
@@ -111,9 +129,9 @@ class YouTubeTranscriptFetcher:
             "params": _panel.encode_params(video_id, track_id),
         }
 
-        response = self.session.post(self.URL, json=request_data, timeout=10)
-        response.raise_for_status()
-        response_data = response.json()
+        response_data = self._post(self.URL, request_data, timeout=10)
+        if not isinstance(response_data.get("content"), dict) or "engagementPanelSectionListRenderer" not in response_data["content"]:
+            raise YouTubeAPIError("YouTube did not return a modern transcript panel.")
         return Transcript.from_response(lang, response_data)
 
     def list_languages(self, video_id) -> LanguageList:
@@ -134,30 +152,19 @@ class YouTubeTranscriptFetcher:
             "racyCheckOk": True,
         }
         try:
-            response = self.session.post(self.PLAYER_URL, json=request_data, timeout=15)
-            response.raise_for_status()
-        except requests.RequestException as e:
-            if hasattr(e, "response") and e.response is not None:
-                if e.response.status_code == 400:
-                    error_data = e.response.json() if e.response.headers.get('content-type', '').startswith('application/json') else {}
-                    if error_data.get('error', {}).get('status') == 'FAILED_PRECONDITION':
-                        raise YouTubeAPIError(
-                            f"API precondition failed for video {video_id}. "
-                            "This may indicate that the video is not available.\n"
-                            f"Response: {error_data}"
-                        ) from e
+            response_data = self._post(self.PLAYER_URL, request_data, timeout=15)
+        except requests.HTTPError as e:
+            if e.response is not None and e.response.status_code == 404:
                 raise VideoNotFoundError(
                     f"Couldn't find video {video_id}. "
                     "Please check the video ID exists and is accessible."
                 ) from e
-            raise Exception(
-                f"Failed to fetch languages for video {video_id}: {e}"
-            ) from e
-        
-        response_data = response.json()
+            raise
         
         # Check playability status
         playability = response_data.get("playabilityStatus", {})
+        if not isinstance(playability, dict) or not playability.get("status"):
+            raise YouTubeAPIError("YouTube did not return a player playability status.")
         status = playability.get("status")
         if status != "OK":
             reason = playability.get("reason", "Unknown reason")

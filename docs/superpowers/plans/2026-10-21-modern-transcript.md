@@ -106,7 +106,7 @@ subject and footer if squash-merging. Leave version and changelog updates to
 semantic-release rather than manually changing them on these branches.
 
 Compatibility regression tests were observed failing against the combined
-implementation before restoring legacy behavior. The same cases will exercise
+implementation before restoring legacy behavior. The same cases exercise
 the new contract on the dependent branch; the protocol/model implementation and
 research artifacts are retained on both branches.
 
@@ -114,3 +114,9 @@ The compatible fix passes 110 tests on Python 3.13, including live checks, and
 105 offline tests on Python 3.9. The workflow's exact python-semantic-release
 10.3.1 parser with this repository's options classifies the planned fix commit
 as PATCH and the explicit breaking-change commit as MAJOR.
+
+The fix is committed as `a1087e6`. The dependent breaking branch also passes all
+110 tests on Python 3.13 and 105 offline tests on Python 3.9. Its production code,
+protocol tests and research artifacts match the preserved pre-split snapshot
+byte-for-byte; only release documentation and expanded transport tests differ.
+Both behavior sets remain available on their respective branches.
