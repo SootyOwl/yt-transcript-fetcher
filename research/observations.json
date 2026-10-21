@@ -1,0 +1,350 @@
+{
+  "date": "2026-10-21",
+  "repository_head": "61254595185cfbde4fcf9239cab76d044015991b",
+  "scope": "Modern get_panel succeeds in bounded functionality probes; legacy get_transcript fails; rate capacity unmeasured",
+  "environment": {
+    "node": "26.12.0",
+    "playwright": "1.64.1",
+    "bgutils-js": "4.0.3",
+    "jsdom": "30.1.3",
+    "browser": "Playwright Chromium build 1234, headless"
+  },
+  "website_source": {
+    "url": "https://www.youtube.com/s/_/ytmainappweb/_/js/k=ytmainappweb.kevlar_base.en_US.UlHPeiH7eiw.es5.O/am=AAAAAAIACEBK/d=1/br=1/rs=AGKMywGrO5Ft76C9QWuTuDrLEdv_wWmNoA/m=kevlar_base_module,kevlar_main_module,kevlar_base_sync_mod_chunk",
+    "sha256": "997c1c95d1edff34275452c5898ae99de73e0d63ac735ea0ce6df5481b85e22f",
+    "bytes": 10866089
+  },
+  "params_fixture": {
+    "video_id": "dQw4w9WgXcQ",
+    "language": "en",
+    "auto_generated": false,
+    "website_params": "CgtkUXc0dzlXZ1hjURIOQ2dBU0FtVnVHZ0ElM0QYASozZW5nYWdlbWVudC1wYW5lbC1zZWFyY2hhYmxlLXRyYW5zY3JpcHQtc2VhcmNoLXBhbmVsMAE4AUAB"
+  },
+  "native_transport_runs": [
+    {
+      "session_condition": "reject cookies, before explicit reload",
+      "status": 400,
+      "error": "FAILED_PRECONDITION",
+      "client_version": "2.20261020.01.00",
+      "request_keys": [
+        "context",
+        "params",
+        "languageCode",
+        "externalVideoId"
+      ],
+      "context_keys": [
+        "client",
+        "user",
+        "request",
+        "clickTracking",
+        "adSignalsInfo"
+      ],
+      "header_names": [
+        ":authority",
+        ":method",
+        ":path",
+        ":scheme",
+        "accept",
+        "accept-encoding",
+        "accept-language",
+        "content-encoding",
+        "content-length",
+        "content-type",
+        "cookie",
+        "device-memory",
+        "origin",
+        "priority",
+        "referer",
+        "sec-ch-dpr",
+        "sec-ch-ua",
+        "sec-ch-ua-mobile",
+        "sec-ch-ua-platform",
+        "sec-ch-viewport-width",
+        "sec-fetch-dest",
+        "sec-fetch-mode",
+        "sec-fetch-site",
+        "user-agent",
+        "x-goog-eom-visitor-id",
+        "x-youtube-bootstrap-logged-in",
+        "x-youtube-client-name",
+        "x-youtube-client-version"
+      ],
+      "attestation_keys": [
+        "challenge",
+        "webResponse"
+      ],
+      "web_response_length": 2037,
+      "external_video_id_matches": true,
+      "transcript_segments": 0,
+      "private_artifact_sha256": "745f537f9fb9665a145191f495dc94becf1fd28901fae19b2f647c0b64b0da59"
+    },
+    {
+      "session_condition": "accept cookies, before explicit reload",
+      "status": 400,
+      "error": "FAILED_PRECONDITION",
+      "client_version": "2.20261020.01.00",
+      "request_keys": [
+        "context",
+        "params",
+        "languageCode",
+        "externalVideoId"
+      ],
+      "context_keys": [
+        "client",
+        "user",
+        "request",
+        "clickTracking",
+        "adSignalsInfo"
+      ],
+      "header_names": [
+        ":authority",
+        ":method",
+        ":path",
+        ":scheme",
+        "accept",
+        "accept-encoding",
+        "accept-language",
+        "content-encoding",
+        "content-length",
+        "content-type",
+        "cookie",
+        "device-memory",
+        "origin",
+        "priority",
+        "referer",
+        "sec-ch-dpr",
+        "sec-ch-ua",
+        "sec-ch-ua-mobile",
+        "sec-ch-ua-platform",
+        "sec-ch-viewport-width",
+        "sec-fetch-dest",
+        "sec-fetch-mode",
+        "sec-fetch-site",
+        "user-agent",
+        "x-goog-eom-visitor-id",
+        "x-youtube-bootstrap-logged-in",
+        "x-youtube-client-name",
+        "x-youtube-client-version"
+      ],
+      "attestation_keys": [
+        "challenge",
+        "webResponse"
+      ],
+      "web_response_length": 2023,
+      "external_video_id_matches": true,
+      "transcript_segments": 0,
+      "private_artifact_sha256": "cd9d997112994660be7d6e844b2f6391709c65a249aa6b67e78c37a080ca5031"
+    },
+    {
+      "session_condition": "accept cookies, after explicit reload",
+      "status": 400,
+      "error": "FAILED_PRECONDITION",
+      "client_version": "2.20261020.01.00",
+      "request_keys": [
+        "context",
+        "params",
+        "languageCode",
+        "externalVideoId"
+      ],
+      "context_keys": [
+        "client",
+        "user",
+        "request",
+        "clickTracking",
+        "adSignalsInfo"
+      ],
+      "header_names": [
+        ":authority",
+        ":method",
+        ":path",
+        ":scheme",
+        "accept",
+        "accept-encoding",
+        "accept-language",
+        "content-encoding",
+        "content-length",
+        "content-type",
+        "cookie",
+        "device-memory",
+        "origin",
+        "priority",
+        "referer",
+        "sec-ch-dpr",
+        "sec-ch-ua",
+        "sec-ch-ua-mobile",
+        "sec-ch-ua-platform",
+        "sec-ch-viewport-width",
+        "sec-fetch-dest",
+        "sec-fetch-mode",
+        "sec-fetch-site",
+        "user-agent",
+        "x-goog-visitor-id",
+        "x-youtube-bootstrap-logged-in",
+        "x-youtube-client-name",
+        "x-youtube-client-version"
+      ],
+      "attestation_keys": [
+        "challenge",
+        "webResponse"
+      ],
+      "web_response_length": 1956,
+      "external_video_id_matches": true,
+      "transcript_segments": 0,
+      "private_artifact_sha256": "9128dea5ca0965b4dab1b9933de68efe9a57fef395b80df18e69b4c6e376835b"
+    }
+  ],
+  "manual_attestation_runs": [
+    {
+      "variant": "Node and JSDOM",
+      "status": 400,
+      "error": "FAILED_PRECONDITION",
+      "attestation_keys": [
+        "challenge",
+        "webResponse"
+      ],
+      "web_response_length": 4415
+    },
+    {
+      "variant": "Chromium manually initialized VM",
+      "status": 400,
+      "error": "FAILED_PRECONDITION",
+      "attestation_keys": [
+        "challenge",
+        "webResponse"
+      ],
+      "web_response_length": 1932
+    }
+  ],
+  "modern_params_fixture": {
+    "video_id": "dQw4w9WgXcQ",
+    "panel_id": "PAmodern_transcript_view",
+    "website_params": "qgkPCgtkUXc0dzlXZ1hjURgC",
+    "track_params_from_server_continuation": "qgkUCgtkUXc0dzlXZ1hjURgCMgMuZW4%3D",
+    "outer_field": 149,
+    "nested_video_field": 1,
+    "nested_mode_field": 3,
+    "observed_mode": 2,
+    "nested_track_field": 6
+  },
+  "modern_panel_runs": [
+    {
+      "video_id": "dQw4w9WgXcQ",
+      "requested_track": null,
+      "selected_track_from_continuation": ".en",
+      "status": 200,
+      "segments": 24,
+      "all_text_nonempty": true,
+      "all_seek_times_match": true,
+      "first_start_ms": 1000,
+      "last_end_ms": 211320,
+      "text_sha256": "1cf5db35273d65caa6030137d0e7992b0d208fb5f48bc08dc88ef1af9a06971f",
+      "cookies_used": false,
+      "attestation_used": false,
+      "browser_bootstrap_used": false,
+      "caption_url_used": false
+    },
+    {
+      "video_id": "Rt6hGvzHR-o",
+      "requested_track": null,
+      "selected_track_from_continuation": null,
+      "status": 200,
+      "segments": 199,
+      "all_text_nonempty": true,
+      "all_seek_times_match": true,
+      "first_start_ms": 0,
+      "last_end_ms": 1496159,
+      "text_sha256": "1df7a39bbc005d193e72905ac5b75be24bcc5925215eaaa1828cdf440c145503",
+      "cookies_used": false,
+      "attestation_used": false,
+      "browser_bootstrap_used": false,
+      "caption_url_used": false
+    },
+    {
+      "video_id": "jNQXAC9IVRw",
+      "requested_track": null,
+      "selected_track_from_continuation": ".en",
+      "status": 200,
+      "segments": 3,
+      "all_text_nonempty": true,
+      "all_seek_times_match": true,
+      "first_start_ms": 1000,
+      "last_end_ms": 18881,
+      "text_sha256": "a3b5639c110567c1e5c295d68a6c1089978980b3deb6abc69a1e718938cb638c",
+      "cookies_used": false,
+      "attestation_used": false,
+      "browser_bootstrap_used": false,
+      "caption_url_used": false
+    },
+    {
+      "video_id": "aircAruvnKk",
+      "requested_track": null,
+      "selected_track_from_continuation": ".en",
+      "status": 200,
+      "segments": 129,
+      "all_text_nonempty": true,
+      "all_seek_times_match": true,
+      "first_start_ms": 4000,
+      "last_end_ms": 1105640,
+      "text_sha256": "d1eebd79be8acd9ae9985bdb1473e12e6ab5c9f8fb0c18ad866c2d1963a6ea69",
+      "cookies_used": false,
+      "attestation_used": false,
+      "browser_bootstrap_used": false,
+      "caption_url_used": false
+    },
+    {
+      "video_id": "dQw4w9WgXcQ",
+      "requested_track": ".en",
+      "selected_track_from_continuation": ".en",
+      "status": 200,
+      "segments": 24,
+      "all_text_nonempty": true,
+      "all_seek_times_match": true,
+      "first_start_ms": 1000,
+      "last_end_ms": 211320,
+      "text_sha256": "1cf5db35273d65caa6030137d0e7992b0d208fb5f48bc08dc88ef1af9a06971f",
+      "cookies_used": false,
+      "attestation_used": false,
+      "browser_bootstrap_used": false,
+      "caption_url_used": false
+    },
+    {
+      "video_id": "dQw4w9WgXcQ",
+      "requested_track": "a.en",
+      "selected_track_from_continuation": "a.en",
+      "status": 200,
+      "segments": 26,
+      "all_text_nonempty": true,
+      "all_seek_times_match": true,
+      "first_start_ms": 0,
+      "last_end_ms": 211879,
+      "text_sha256": "b8cf5827ae97332fb792370eeae3eeae9793d5ca3de111171ebd0ead722c4731",
+      "cookies_used": false,
+      "attestation_used": false,
+      "browser_bootstrap_used": false,
+      "caption_url_used": false
+    },
+    {
+      "video_id": "dQw4w9WgXcQ",
+      "requested_track": ".ja",
+      "selected_track_from_continuation": ".ja",
+      "status": 200,
+      "segments": 23,
+      "all_text_nonempty": true,
+      "all_seek_times_match": true,
+      "first_start_ms": 18000,
+      "last_end_ms": 211320,
+      "text_sha256": "15f44ed3f190882bb3b4362bf69aca988d3116c87d9c0bb72558518bdcc12735",
+      "cookies_used": false,
+      "attestation_used": false,
+      "browser_bootstrap_used": false,
+      "caption_url_used": false
+    }
+  ],
+  "invalid_track_control": {
+    "requested_track": ".zz_DOES_NOT_EXIST",
+    "http_status": 200,
+    "segments": 24,
+    "text_equals_default": true,
+    "prototype_now_checks_selected_track": true
+  }
+}
