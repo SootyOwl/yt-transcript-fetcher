@@ -2,9 +2,9 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
+from yt_transcript_fetcher import _panel
 from yt_transcript_fetcher.exceptions import NoTranscriptError, VideoNotFoundError, YouTubeAPIError
 from yt_transcript_fetcher.models import LanguageList, Transcript
-from yt_transcript_fetcher.protobuf import encode_visitor_data, generate_params
 
 YouTubeVideoID = str
 """Type alias for YouTube video ID, which is a string."""
@@ -13,16 +13,19 @@ YouTubeVideoID = str
 class YouTubeTranscriptFetcher:
     """A class to fetch YouTube video transcripts and available languages."""
 
-    # Client configuration for YouTube's internal API
-    # Using older Android version (19.09.37) to avoid attestation (PO Token) requirement
-    # Newer versions (20.x) and WEB clients require attestation which cannot be
-    # generated in pure Python. See: https://github.com/LuanRT/YouTube.js/issues/1102
+    # Player discovery and modern panels use separate client profiles.
     CLIENT = {
         "clientName": "ANDROID",
-        "clientVersion": "19.09.37",
-        "userAgent": "com.google.android.youtube/19.09.37 (Linux; U; Android 11) gzip",
+        "clientVersion": "20.10.38",
+        "userAgent": "com.google.android.youtube/20.10.38 (Linux; U; Android 11) gzip",
         "osName": "Android",
         "osVersion": "11",
+    }
+    PANEL_CLIENT = {
+        "clientName": "WEB",
+        "clientVersion": "2.20261020.01.00",
+        "hl": "en",
+        "gl": "GB",
     }
 
     def __init__(self, session=None):
@@ -31,22 +34,14 @@ class YouTubeTranscriptFetcher:
         Args:
             session: An optional requests.Session object to use for API calls.
         """
-        self.session = session or requests.Session()
-        
-        # Generate visitorData using the same approach as YouTube.js
-        # This is a protobuf-encoded token that identifies the session
-        # and is required by YouTube's API to avoid FAILED_PRECONDITION errors
-        self._visitor_data = encode_visitor_data()
-        
-        # Build context with client config and visitorData
-        client_config = self.CLIENT.copy()
-        client_config["visitorData"] = self._visitor_data
-        self._context = {"client": client_config}
+        self.session = session if session is not None else requests.Session()
+        self._context = {"client": self.CLIENT.copy()}
+        self._panel_context = {"client": self.PANEL_CLIENT.copy()}
         # Initialise session if not provided, otherwise assume it's already set up
-        if not session:
+        if session is None:
             self.initialise_session()
         self.URL = (
-            "https://www.youtube.com/youtubei/v1/get_transcript?prettyPrint=false"
+            "https://www.youtube.com/youtubei/v1/get_panel?prettyPrint=false"
         )
         self.PLAYER_URL = (
             "https://www.youtube.com/youtubei/v1/player?prettyPrint=false"
@@ -70,9 +65,6 @@ class YouTubeTranscriptFetcher:
             }
         )
         # Configure retries with exponential backoff for transient errors and rate limiting
-        # Sometimes (roughly 1% of requests) we get a 400 Bad Request despite the video ID being valid
-        # and the request being well-formed - seems to be a gRPC FAILED_PRECONDITION error from YouTube (#3).
-        # Retrying a few times seems to mitigate this issue for now.
         retry = Retry(
             total=2,
             connect=1,
@@ -109,16 +101,14 @@ class YouTubeTranscriptFetcher:
                 f"No transcript available for video {video_id} in language {language}."
             )
 
-        # Generate params with correct auto_generated flag based on caption type
-        params = generate_params(
-            video_id=video_id,
-            language=lang.code,
-            auto_generated=lang.is_auto_generated
+        track_id = getattr(lang, "_vss_id", None) or (
+            ("a." if lang.is_auto_generated else ".") + lang.code
         )
 
         request_data = {
-            "context": self._context,
-            "params": params,
+            "context": self._panel_context,
+            "panelId": _panel.PANEL_ID,
+            "params": _panel.encode_params(video_id, track_id),
         }
 
         response = self.session.post(self.URL, json=request_data, timeout=10)

@@ -3,7 +3,8 @@
 from dataclasses import dataclass
 from typing import Union
 
-from yt_transcript_fetcher.exceptions import NoLanguageError, NoSegmentsError
+from yt_transcript_fetcher.exceptions import NoLanguageError, NoSegmentsError, NoTranscriptError, YouTubeAPIError
+from yt_transcript_fetcher import _panel
 from yt_transcript_fetcher.protobuf import generate_params, get_video_id, is_asr_captions, retrieve_language_code
 
 
@@ -146,8 +147,24 @@ class LanguageList:
         captions = response_data.get("captions", {})
         pctr = captions.get("playerCaptionsTracklistRenderer", {})
         caption_tracks = pctr.get("captionTracks", [])
+
+        # Non-dataclass metadata preserves the existing constructor, repr,
+        # equality and dataclasses.asdict schema while retaining exact track IDs.
+        track_ids = [track.get("vssId") or (
+            ("a." if track.get("kind") == "asr" else ".") + track.get("languageCode", "")
+        ) for track in caption_tracks]
+        default_track = track_ids[0] if len(track_ids) == 1 else None
+        audio_tracks = pctr.get("audioTracks", [])
+        if not isinstance(audio_tracks, list):
+            audio_tracks = []
+        audio_index = pctr.get("defaultAudioTrackIndex", 0 if len(audio_tracks) == 1 else None)
+        if (type(audio_index) is int and 0 <= audio_index < len(audio_tracks)
+                and isinstance(audio_tracks[audio_index], dict)):
+            default_index = audio_tracks[audio_index].get("defaultCaptionTrackIndex")
+            if type(default_index) is int and 0 <= default_index < len(track_ids):
+                default_track = track_ids[default_index]
         
-        for track in caption_tracks:
+        for track_index, track in enumerate(caption_tracks):
             lang_code = track.get("languageCode", "")
             if not lang_code:
                 continue
@@ -166,21 +183,22 @@ class LanguageList:
             # kind == "asr" means auto-generated (Automatic Speech Recognition)
             is_auto_generated = track.get("kind") == "asr"
             
-            # Generate continuation token for /get_transcript API
+            # Retain the legacy token format for existing callers and decoders.
             continuation_token = generate_params(
                 video_id=video_id,
                 language=lang_code,
                 auto_generated=is_auto_generated
             )
             
-            languages.append(
-                Language(
-                    code=lang_code,
-                    display_name=display_name,
-                    is_auto_generated=is_auto_generated,
-                    _continuation_token=continuation_token,
-                )
+            language = Language(
+                code=lang_code,
+                display_name=display_name,
+                is_auto_generated=is_auto_generated,
+                _continuation_token=continuation_token,
             )
+            language._vss_id = track_ids[track_index]
+            language._default_vss_id = default_track
+            languages.append(language)
         
         return cls(languages=languages)
 
@@ -341,10 +359,13 @@ class SegmentList:
     def from_response(cls, response_data):
         """Create a SegmentList from a response dictionary.
         
-        Handles two response formats:
+        Handles three response formats:
         1. WEB format: actions[0].updateEngagementPanelAction.content...
         2. Android/iOS format: actions[0].elementsCommand.transformEntityCommand...
+        3. Modern panel views with a separately referenced timing entity.
         """
+        if "engagementPanelSectionListRenderer" in response_data.get("content", {}):
+            return cls([Segment(**segment) for segment in _panel.segments(response_data)])
         initial_transcript_parts = []
         
         # Try WEB format first (updateEngagementPanelAction)
@@ -502,8 +523,25 @@ class Transcript:
     @classmethod
     def from_response(cls, language: Language, response_data: dict):
         """Create a Transcript from a response dictionary."""
+        video_id = get_video_id(language._continuation_token)
+        segments = SegmentList.from_response(response_data)
+        if "engagementPanelSectionListRenderer" in response_data.get("content", {}):
+            selected_video, selected_track = _panel.selection(response_data)
+            if selected_video != video_id:
+                raise YouTubeAPIError("Transcript response belongs to a different video.")
+            if selected_track is None:
+                selected_track = getattr(language, "_default_vss_id", None)
+                if selected_track is None:
+                    raise YouTubeAPIError("Unable to verify the default caption track.")
+            expected_track = getattr(language, "_vss_id", None) or (
+                ("a." if language.is_auto_generated else ".") + language.code
+            )
+            if selected_track != expected_track:
+                raise NoTranscriptError(
+                    f"No transcript available for video {video_id} in language {language.code}."
+                )
         return cls(
-            video_id=get_video_id(language._continuation_token),
+            video_id=video_id,
             language=language,
-            segments=SegmentList.from_response(response_data),
+            segments=segments,
         )
