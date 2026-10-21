@@ -46,7 +46,7 @@ jobs:
     if: github.repository_owner == 'SootyOwl' && ((github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')|| github.event_name == 'workflow_dispatch')
     steps:
       - name: Setup | Checkout Repository on Main (or triggering branch)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || 'main' }}
           fetch-depth: 0
@@ -100,15 +100,15 @@ jobs:
           no_operation_mode: ${{ steps.mode.outputs.noop }}
 
       - name: Publish | Upload to GitHub Release Assets
-        if: steps.release.outputs.released == 'true'
+        if: steps.release.outputs.released == 'true' && steps.mode.outputs.mode == 'LIVE'
         uses: python-semantic-release/publish-action@v10.3.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ steps.release.outputs.tag }}
 
       - name: Upload | Distribution Artifacts
-        if: steps.release.outputs.released == 'true'
-        uses: actions/upload-artifact@v4
+        if: steps.release.outputs.released == 'true' && steps.mode.outputs.mode == 'LIVE'
+        uses: actions/upload-artifact@v6
         with:
           name: distribution-artifacts
           path: dist
@@ -118,13 +118,13 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: release
-    if: needs.release.outputs.released == 'true' && needs.release.outputs.mode != 'DRY-RUN'
+    if: needs.release.outputs.released == 'true' && needs.release.outputs.mode == 'LIVE'
     permissions:
       contents: read
       id-token: write
     steps:
       - name: Setup | Download Build Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: distribution-artifacts
           path: dist
