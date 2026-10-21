@@ -59,7 +59,7 @@ dev = [
 ]
 
 [project.optional-dependencies]
-build = ["uv ~= 0.8.14"]
+build = ["uv>=0.8.14,<0.14.0"]
 
 [build-system]
 requires = ["hatchling"]
