@@ -8,7 +8,7 @@ import requests
 
 import yt_transcript_fetcher as package
 from yt_transcript_fetcher import Language, LanguageList, Transcript, YouTubeTranscriptFetcher
-from yt_transcript_fetcher.exceptions import NoLanguageError, NoSegmentsError, NoTranscriptError, VideoNotFoundError, YouTubeAPIError
+from yt_transcript_fetcher.exceptions import NoLanguageError, NoTranscriptError, VideoNotFoundError, YouTubeAPIError
 from yt_transcript_fetcher.protobuf import generate_params
 
 
@@ -120,86 +120,82 @@ def test_video_without_captions_preserves_exception():
 
 @pytest.mark.parametrize("method", ["list_languages", "get_transcript"])
 @pytest.mark.parametrize("status", [400, 401, 403, 404, 429, 500, 503])
-def test_http_failures_preserve_legacy_exception_contract(method, status):
+def test_http_failures_preserve_transport_errors_except_discovery_404(method, status):
     session = RecordingSession(response({}, status))
     fetcher = YouTubeTranscriptFetcher(session)
     if method == "get_transcript":
         fetcher.languages[VIDEO] = LanguageList([Language("en", "English", False, generate_params(VIDEO, "en", False))])
-    expected = VideoNotFoundError if method == "list_languages" else requests.HTTPError
+    missing_video = method == "list_languages" and status == 404
+    expected = VideoNotFoundError if missing_video else requests.HTTPError
     with pytest.raises(expected) as error:
         getattr(fetcher, method)(VIDEO)
-    http_error = error.value.__cause__ if method == "list_languages" else error.value
+    http_error = error.value.__cause__ if missing_video else error.value
     assert isinstance(http_error, requests.HTTPError)
     assert http_error.response.status_code == status
 
 
 @pytest.mark.parametrize("method", ["list_languages", "get_transcript"])
-def test_precondition_failures_preserve_endpoint_specific_exceptions(method):
+def test_precondition_failures_raise_api_error_on_both_endpoints(method):
     fetcher = YouTubeTranscriptFetcher(RecordingSession(response({"error": {"status": "FAILED_PRECONDITION"}}, 400)))
     if method == "get_transcript":
         fetcher.languages[VIDEO] = LanguageList([Language("en", "English", False, generate_params(VIDEO, "en", False))])
-    expected = YouTubeAPIError if method == "list_languages" else requests.HTTPError
-    with pytest.raises(expected):
+    with pytest.raises(YouTubeAPIError, match="precondition"):
         getattr(fetcher, method)(VIDEO)
 
 
-def test_default_session_preserves_http_400_retries():
+def test_default_session_retries_transient_statuses_but_not_http_400():
     fetcher = YouTubeTranscriptFetcher()
     retry = fetcher.session.get_adapter(fetcher.URL).max_retries
-    assert retry.is_retry("POST", 400)
+    assert not retry.is_retry("POST", 400)
     assert retry.is_retry("POST", 429)
     assert retry.is_retry("POST", 503)
 
 
-@pytest.mark.parametrize("data,expected", [
-    ({}, VideoNotFoundError),
-    ([], AttributeError),
-    ({"error": {"message": "Unexpected API failure"}}, VideoNotFoundError),
+@pytest.mark.parametrize("data", [
+    {},
+    [],
+    {"error": {"message": "Unexpected API failure"}},
 ])
-def test_malformed_player_response_preserves_legacy_errors(data, expected):
-    with pytest.raises(expected):
+def test_malformed_player_response_raises_api_error(data):
+    with pytest.raises(YouTubeAPIError):
         YouTubeTranscriptFetcher(RecordingSession(response(data))).list_languages(VIDEO)
 
 
 @pytest.mark.parametrize("method", ["list_languages", "get_transcript"])
 @pytest.mark.parametrize("failure_type", [requests.Timeout, requests.ConnectionError])
-def test_network_failures_preserve_legacy_wrapping(method, failure_type):
+def test_network_failures_preserve_requests_exception_on_both_endpoints(method, failure_type):
     failure = failure_type("Connection failed")
     fetcher = YouTubeTranscriptFetcher(RecordingSession(failure))
     if method == "get_transcript":
         fetcher.languages[VIDEO] = LanguageList([Language("en", "English", False, generate_params(VIDEO, "en", False))])
-    with pytest.raises(Exception) as error:
+    with pytest.raises(failure_type) as error:
         getattr(fetcher, method)(VIDEO)
-    if method == "list_languages":
-        assert type(error.value) is Exception
-        assert error.value.__cause__ is failure
-        assert f"Failed to fetch languages for video {VIDEO}" in str(error.value)
-    else:
-        assert error.value is failure
+    assert error.value is failure
 
 
-def test_uncached_transcript_preserves_discovery_error_contract():
+def test_uncached_transcript_propagates_discovery_http_error():
     fetcher = YouTubeTranscriptFetcher(RecordingSession(response({}, 429)))
-    with pytest.raises(VideoNotFoundError) as error:
+    with pytest.raises(requests.HTTPError) as error:
         fetcher.get_transcript(VIDEO)
-    assert error.value.__cause__.response.status_code == 429
+    assert error.value.response.status_code == 429
 
 
 @pytest.mark.parametrize("method", ["list_languages", "get_transcript"])
-def test_invalid_json_preserves_requests_decode_error(method):
+def test_invalid_json_raises_api_error_with_decode_error_as_cause(method):
     invalid = response({})
     invalid._content = b"not JSON"
     fetcher = YouTubeTranscriptFetcher(RecordingSession(invalid))
     if method == "get_transcript":
         fetcher.languages[VIDEO] = LanguageList([Language("en", "English", False, generate_params(VIDEO, "en", False))])
-    with pytest.raises(requests.exceptions.JSONDecodeError):
+    with pytest.raises(YouTubeAPIError) as error:
         getattr(fetcher, method)(VIDEO)
+    assert isinstance(error.value.__cause__, requests.exceptions.JSONDecodeError)
 
 
-def test_missing_panel_preserves_no_segments_error():
+def test_missing_panel_is_a_protocol_error():
     fetcher = YouTubeTranscriptFetcher(RecordingSession(response({})))
     fetcher.languages[VIDEO] = LanguageList([Language("en", "English", False, generate_params(VIDEO, "en", False))])
-    with pytest.raises(NoSegmentsError):
+    with pytest.raises(YouTubeAPIError):
         fetcher.get_transcript(VIDEO)
 
 
