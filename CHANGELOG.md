@@ -2,6 +2,33 @@
 
 <!-- version list -->
 
+## v2.0.0 (2026-10-21)
+
+### Chores
+
+- **deps**: Bump certifi from 2025.4.26 to 2026.10.19
+  ([#16](https://github.com/SootyOwl/yt-transcript-fetcher/pull/16),
+  [`d6c25f7`](https://github.com/SootyOwl/yt-transcript-fetcher/commit/d6c25f7084115ffa4afaf777584bfe801ae00ae7))
+
+- **deps**: Bump the uv group across 1 directory with 5 updates
+  ([`59c93d1`](https://github.com/SootyOwl/yt-transcript-fetcher/commit/59c93d100d1729b5ec51be555ab4586093e52ac6))
+
+- **deps**: Bump tornado from 6.5.4 to 6.5.9
+  ([#14](https://github.com/SootyOwl/yt-transcript-fetcher/pull/14),
+  [`90285f1`](https://github.com/SootyOwl/yt-transcript-fetcher/commit/90285f16536ebfbec18562fba69232dafc7ce6cc))
+
+- **deps**: Bump uv from 0.8.15 to 0.13.4
+  ([`6ed80c4`](https://github.com/SootyOwl/yt-transcript-fetcher/commit/6ed80c43df3eb6e2ff73b680dc9f15170115ca73))
+
+### Continuous Integration
+
+- Guard dry-run releases and update action runtimes
+  ([`4bbfc3b`](https://github.com/SootyOwl/yt-transcript-fetcher/commit/4bbfc3b8e3f9d9525c39fe789156e21daa996f37))
+
+- Serialize releases through publication and cancel stale tests
+  ([`be67c5b`](https://github.com/SootyOwl/yt-transcript-fetcher/commit/be67c5baf871abb64162952c9b5c75b13b99cd78))
+
+
 ## v1.2.2 (2026-10-21)
 
 ### Bug Fixes

@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.9, <4.0"
 resolution-markers = [
     "python_full_version >= '3.11'",
@@ -1047,7 +1047,7 @@ wheels = [
 
 [[package]]
 name = "yt-transcript-fetcher"
-version = "1.2.2"
+version = "2.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "argcomplete" },
