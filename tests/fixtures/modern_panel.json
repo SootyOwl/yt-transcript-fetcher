@@ -1,0 +1,200 @@
+{
+  "content": {
+    "engagementPanelSectionListRenderer": {
+      "onShowCommands": [
+        {
+          "updateTimedMarkersSyncObserverCommand": {
+            "timedSyncEntityKey": "fixture-timings"
+          }
+        }
+      ],
+      "content": {
+        "sectionListRenderer": {
+          "header": {
+            "searchInputViewModel": {
+              "onInputAction": {
+                "command": {
+                  "innertubeCommand": {
+                    "continuationCommand": {
+                      "token": "kta-ngs-EhhQQW1vZGVybl90cmFuc2NyaXB0X3ZpZXcaInFna1VDZ3RxVGxGWVFVTTVTVlpTZHhnQ01nTXVaVzQlM0Q%3D",
+                      "request": "CONTINUATION_REQUEST_TYPE_GET_PANEL"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "contents": [
+            {
+              "itemSectionRenderer": {
+                "contents": [
+                  {
+                    "macroMarkersPanelItemViewModel": {
+                      "index": 1,
+                      "item": {
+                        "timelineItemViewModel": {
+                          "contentItems": [
+                            {
+                              "transcriptSegmentViewModel": {
+                                "simpleText": "Sample text 1",
+                                "timestamp": "0:01",
+                                "accessibilityHint": "Seek to sample 1"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "onTap": {
+                        "innertubeCommand": {
+                          "watchEndpoint": {
+                            "videoId": "jNQXAC9IVRw",
+                            "continuePlayback": true,
+                            "startTimeSeconds": 1
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "itemSectionRenderer": {
+                "contents": [
+                  {
+                    "macroMarkersPanelItemViewModel": {
+                      "index": 3,
+                      "item": {
+                        "timelineItemViewModel": {
+                          "contentItems": [
+                            {
+                              "transcriptSegmentViewModel": {
+                                "simpleText": "Sample text 2",
+                                "timestamp": "0:07",
+                                "accessibilityHint": "Seek to sample 2"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "onTap": {
+                        "innertubeCommand": {
+                          "watchEndpoint": {
+                            "videoId": "jNQXAC9IVRw",
+                            "continuePlayback": true,
+                            "startTimeSeconds": 7
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "macroMarkersPanelItemViewModel": {
+                      "index": 4,
+                      "item": {
+                        "timelineItemViewModel": {
+                          "contentItems": [
+                            {
+                              "transcriptSegmentViewModel": {
+                                "simpleText": "Sample text 3",
+                                "timestamp": "0:16",
+                                "accessibilityHint": "Seek to sample 3"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "onTap": {
+                        "innertubeCommand": {
+                          "watchEndpoint": {
+                            "videoId": "jNQXAC9IVRw",
+                            "continuePlayback": true,
+                            "startTimeSeconds": 16
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "itemSectionRenderer": {
+                "contents": []
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "frameworkUpdates": {
+    "entityBatchUpdate": {
+      "mutations": [
+        {
+          "payload": {
+            "timedMarkersListSyncEntity": {
+              "key": "unrelated",
+              "timedListData": {
+                "sections": []
+              }
+            }
+          }
+        },
+        {
+          "payload": {
+            "timedMarkersListSyncEntity": {
+              "key": "fixture-timings",
+              "timedListData": {
+                "sections": [
+                  {
+                    "sectionId": "timeline_view_section0",
+                    "timedSyncDataList": [
+                      {
+                        "videoTimeMs": "0",
+                        "syncItemId": "timeline_view_sync_item0_0"
+                      },
+                      {
+                        "videoTimeMs": "1000",
+                        "syncItemId": "timeline_view_sync_item0_1",
+                        "endTimeMs": "7974"
+                      }
+                    ]
+                  },
+                  {
+                    "sectionId": "timeline_view_section1",
+                    "timedSyncDataList": [
+                      {
+                        "videoTimeMs": "5000",
+                        "syncItemId": "timeline_view_sync_item1_0"
+                      },
+                      {
+                        "videoTimeMs": "7000",
+                        "syncItemId": "timeline_view_sync_item1_1",
+                        "endTimeMs": "15733"
+                      },
+                      {
+                        "videoTimeMs": "16000",
+                        "syncItemId": "timeline_view_sync_item1_2",
+                        "endTimeMs": "18881"
+                      }
+                    ]
+                  },
+                  {
+                    "sectionId": "timeline_view_section2",
+                    "timedSyncDataList": [
+                      {
+                        "videoTimeMs": "17000",
+                        "syncItemId": "timeline_view_sync_item2_0"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
