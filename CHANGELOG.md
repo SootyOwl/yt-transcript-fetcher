@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.2.2 (2026-10-21)
+
+### Bug Fixes
+
+- **api**: Restore transcripts using modern YouTube panels
+  ([`a1087e6`](https://github.com/SootyOwl/yt-transcript-fetcher/commit/a1087e6936c4db59c6a2d5f9ede79de18825d52d))
+
+### Chores
+
+- **notebook**: Clean up notebook
+  ([`6125459`](https://github.com/SootyOwl/yt-transcript-fetcher/commit/61254595185cfbde4fcf9239cab76d044015991b))
+
+
 ## v1.2.1 (2025-12-29)
 
 ### Bug Fixes

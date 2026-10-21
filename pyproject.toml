@@ -1,6 +1,6 @@
 [project]
 name = "yt-transcript-fetcher"
-version = "1.2.1"
+version = "1.2.2"
 description = "This library can be used to fetch transcripts for YouTube videos"
 authors = [{ name = "Dan Eagle", email = "dan@tyto.cc" }]
 requires-python = ">=3.9,<4.0"
@@ -59,7 +59,7 @@ dev = [
 ]
 
 [project.optional-dependencies]
-build = ["uv ~= 0.8.14"]
+build = ["uv>=0.8.14,<0.14.0"]
 
 [build-system]
 requires = ["hatchling"]
