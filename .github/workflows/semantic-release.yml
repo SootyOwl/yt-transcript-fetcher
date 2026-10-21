@@ -27,13 +27,15 @@ on:
     types: [completed]
     branches: [main]
 
+# Keep the release lock through PyPI publication; manual releases also target main.
+concurrency:
+  group: semantic-release-main
+  cancel-in-progress: false
+
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-release-${{ github.ref_name }}
-      cancel-in-progress: false
     permissions:
       contents: write
       actions: read
