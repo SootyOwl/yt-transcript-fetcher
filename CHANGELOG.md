@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v2.0.1 (2026-11-05)
+
+### Bug Fixes
+
+- Resolve default captions for multilingual ASR videos
+  ([`95cf16a`](https://github.com/SootyOwl/yt-transcript-fetcher/commit/95cf16a0d424c5ae52b9f7828ceffcbe69e7cffc))
+
+
 ## v2.0.0 (2026-10-21)
 
 ### Chores
