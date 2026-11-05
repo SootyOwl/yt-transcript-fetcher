@@ -1,0 +1,332 @@
+{
+  "playabilityStatus": {
+    "status": "OK"
+  },
+  "captions": {
+    "playerCaptionsTracklistRenderer": {
+      "audioTracks": [
+        {
+          "audioTrackId": "it.10"
+        },
+        {
+          "audioTrackId": "id.10"
+        },
+        {
+          "audioTrackId": "de-DE.10"
+        },
+        {
+          "audioTrackId": "pl.10"
+        },
+        {
+          "audioTrackId": "bn.10"
+        },
+        {
+          "audioTrackId": "hi.10"
+        },
+        {
+          "audioTrackId": "ru.10"
+        },
+        {
+          "audioTrackId": "es-US.10"
+        },
+        {
+          "audioTrackId": "ja.10"
+        },
+        {
+          "audioTrackId": "pt-BR.10"
+        },
+        {
+          "audioTrackId": "uk.10"
+        },
+        {
+          "audioTrackId": "en-US.4"
+        },
+        {
+          "audioTrackId": "ta.10"
+        },
+        {
+          "audioTrackId": "iw.10"
+        },
+        {
+          "audioTrackId": "te.10"
+        },
+        {
+          "audioTrackId": "ar.10"
+        },
+        {
+          "audioTrackId": "fr-FR.10"
+        },
+        {
+          "audioTrackId": "ko.10"
+        },
+        {
+          "audioTrackId": "ml.10"
+        },
+        {
+          "audioTrackId": "nl-NL.10"
+        },
+        {
+          "audioTrackId": "pa.10"
+        }
+      ],
+      "defaultAudioTrackIndex": 11,
+      "defaultTranslationSourceTrackIndices": [
+        3
+      ],
+      "captionTracks": [
+        {
+          "languageCode": "ar",
+          "vssId": "a.ar",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "Arabic (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "bn",
+          "vssId": "a.bn",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "Bangla (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "nl",
+          "vssId": "a.nl",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "Dutch (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "en",
+          "vssId": "a.en",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "English (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "fr",
+          "vssId": "a.fr",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "French (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "de",
+          "vssId": "a.de",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "German (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "iw",
+          "vssId": "a.iw",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "Hebrew (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "hi",
+          "vssId": "a.hi",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "Hindi (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "id",
+          "vssId": "a.id",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "Indonesian (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "it",
+          "vssId": "a.it",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "Italian (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "ja",
+          "vssId": "a.ja",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "Japanese (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "ko",
+          "vssId": "a.ko",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "Korean (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "ml",
+          "vssId": "a.ml",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "Malayalam (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "pl",
+          "vssId": "a.pl",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "Polish (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "pt",
+          "vssId": "a.pt",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "Portuguese (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "pa",
+          "vssId": "a.pa",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "Punjabi (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "ru",
+          "vssId": "a.ru",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "Russian (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "es",
+          "vssId": "a.es",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "Spanish (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "ta",
+          "vssId": "a.ta",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "Tamil (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "te",
+          "vssId": "a.te",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "Telugu (auto-generated)"
+              }
+            ]
+          }
+        },
+        {
+          "languageCode": "uk",
+          "vssId": "a.uk",
+          "kind": "asr",
+          "name": {
+            "runs": [
+              {
+                "text": "Ukrainian (auto-generated)"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

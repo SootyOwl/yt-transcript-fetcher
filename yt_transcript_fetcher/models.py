@@ -163,6 +163,18 @@ class LanguageList:
             default_index = audio_tracks[audio_index].get("defaultCaptionTrackIndex")
             if type(default_index) is int and 0 <= default_index < len(track_ids):
                 default_track = track_ids[default_index]
+
+        # Multi-audio ASR videos can omit defaultCaptionTrackIndex. The panel
+        # then returns the original translation source without echoing a vssId,
+        # even when another dubbed ASR track was requested. Only resolve this
+        # case for one explicit source and exclusively automatic captions;
+        # translation sources do not establish the preferred manual track.
+        if default_track is None and all(track.get("kind") == "asr" for track in caption_tracks):
+            source_indices = pctr.get("defaultTranslationSourceTrackIndices")
+            if isinstance(source_indices, list) and len(source_indices) == 1:
+                source_index = source_indices[0]
+                if type(source_index) is int and 0 <= source_index < len(track_ids):
+                    default_track = track_ids[source_index]
         
         for track_index, track in enumerate(caption_tracks):
             lang_code = track.get("languageCode", "")
