@@ -15,6 +15,57 @@ from yt_transcript_fetcher.protobuf import generate_params
 VIDEO = "jNQXAC9IVRw"
 
 
+@pytest.fixture
+def multilingual_player():
+    # Reduced live metadata from tqAangiY0FE; no caption URLs or session data.
+    return json.loads(Path(__file__).with_name("fixtures").joinpath("multilingual_asr_player.json").read_text())
+
+
+@pytest.fixture
+def default_asr_panel(panel_response):
+    header = panel_response["content"]["engagementPanelSectionListRenderer"]["content"]["sectionListRenderer"]["header"]
+    header["searchInputViewModel"]["onInputAction"]["command"]["innertubeCommand"]["continuationCommand"]["token"] = "kta-ngs0EhhQQW1vZGVybl90cmFuc2NyaXB0X3ZpZXcaGHFna1BDZ3QwY1VGaGJtZHBXVEJHUlJnQw%3D%3D"
+    return panel_response
+
+
+def test_multilingual_asr_default_source_returns_english(multilingual_player, default_asr_panel):
+    session = RecordingSession(response(multilingual_player), response(default_asr_panel))
+    transcript = YouTubeTranscriptFetcher(session).get_transcript("tqAangiY0FE", "en")
+    assert transcript.video_id == "tqAangiY0FE"
+    assert transcript.language.code == "en"
+    assert transcript.language.is_auto_generated
+    assert transcript.text == "Sample text 1\nSample text 2\nSample text 3"
+
+
+def test_multilingual_asr_default_is_not_mislabeled_as_french(multilingual_player, default_asr_panel):
+    session = RecordingSession(response(multilingual_player), response(default_asr_panel))
+    with pytest.raises(NoTranscriptError):
+        YouTubeTranscriptFetcher(session).get_transcript("tqAangiY0FE", "fr")
+
+
+@pytest.mark.parametrize("sources", [None, [], [3, 4], [True], [-1], [21], ["3"], "3", {"0": 3}])
+def test_invalid_or_ambiguous_default_sources_are_not_guessed(multilingual_player, default_asr_panel, sources):
+    multilingual_player["captions"]["playerCaptionsTracklistRenderer"]["defaultTranslationSourceTrackIndices"] = sources
+    session = RecordingSession(response(multilingual_player), response(default_asr_panel))
+    with pytest.raises(YouTubeAPIError):
+        YouTubeTranscriptFetcher(session).get_transcript("tqAangiY0FE")
+
+
+def test_translation_source_does_not_override_explicit_default(multilingual_player, default_asr_panel):
+    metadata = multilingual_player["captions"]["playerCaptionsTracklistRenderer"]
+    metadata["audioTracks"][11]["defaultCaptionTrackIndex"] = 4
+    session = RecordingSession(response(multilingual_player), response(default_asr_panel))
+    with pytest.raises(NoTranscriptError):
+        YouTubeTranscriptFetcher(session).get_transcript("tqAangiY0FE")
+
+
+def test_translation_source_is_not_assumed_default_with_manual_tracks(multilingual_player, default_asr_panel):
+    del multilingual_player["captions"]["playerCaptionsTracklistRenderer"]["captionTracks"][0]["kind"]
+    session = RecordingSession(response(multilingual_player), response(default_asr_panel))
+    with pytest.raises(YouTubeAPIError):
+        YouTubeTranscriptFetcher(session).get_transcript("tqAangiY0FE")
+
+
 def response(data, status=200):
     result = requests.Response()
     result.status_code = status
